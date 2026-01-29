@@ -2,7 +2,7 @@ import React from "react";
 import { Terminal, Brain, GraduationCap, Zap, ArrowRight } from "lucide-react";
 
 export default function Features() {
-  // Array containing feature details for clean management
+  
   const featureData = [
     {
       icon: <Terminal size={26} />,
@@ -29,7 +29,7 @@ export default function Features() {
 
   return (
     <section className="py-24 bg-[#050505] relative overflow-hidden">
-      {/* Background Glows to match the Hero Section aesthetic */}
+   
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/10 blur-[120px] rounded-full" />
         <div className="absolute bottom-[10%] right-[-5%] w-[30%] h-[30%] bg-purple-600/10 blur-[100px] rounded-full" />
@@ -37,7 +37,7 @@ export default function Features() {
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         
-        {/* Section Header with Gradient Typography */}
+       
         <div className="text-center mb-20">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-indigo-400 text-xs font-bold tracking-widest uppercase mb-6">
             <Zap size={14} fill="currentColor" /> Features
@@ -50,17 +50,17 @@ export default function Features() {
           </p>
         </div>
 
-        {/* Features Grid with Dark Cards and Neon Borders */}
+       
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {featureData.map((item, index) => (
             <div 
               key={index}
               className={`group relative p-10 rounded-[2.5rem] bg-[#0A0A0C] border border-white/5 hover:border-white/10 transition-all duration-500 overflow-hidden hover:-translate-y-2`}
             >
-              {/* Subtle gradient overlay visible on hover */}
+              
               <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-[0.03] transition-opacity duration-500`} />
 
-              {/* Styled Icon Container with dynamic shadows */}
+             
               <div className={`w-16 h-16 bg-gradient-to-br ${item.color} rounded-2xl flex items-center justify-center mb-8 text-white shadow-lg ${item.shadow} group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}>
                 {item.icon}
               </div>
@@ -72,7 +72,7 @@ export default function Features() {
                 {item.desc}
               </p>
 
-              {/* Interactive call-to-action link */}
+              
               <div className="flex items-center gap-2 text-white/40 group-hover:text-white text-sm font-bold transition-all duration-300 cursor-pointer">
                 Learn More <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
               </div>

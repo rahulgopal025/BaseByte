@@ -93,7 +93,7 @@ export default function Auth() {
               className="w-full pl-12 pr-12 py-4 rounded-2xl bg-white/[0.03] border border-white/5 text-white outline-none focus:border-indigo-500 transition-all"
               onChange={(e) => setPassword(e.target.value)}
             />
-            {/* Eye Icon Button */}
+            
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}

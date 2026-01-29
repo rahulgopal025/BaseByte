@@ -7,7 +7,6 @@ import { Zap } from "lucide-react";
 export default function Home() {
   const [userName, setUserName] = useState("Student");
 
-  // Load user data from localStorage and extract the first name
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -25,7 +24,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#050505] text-white selection:bg-indigo-500/30">
       
-      {/* Personalized Welcome Section - Optimized for both Desktop Hover and Mobile Touch */}
+      
       {localStorage.getItem("user") && (
         <section className="max-w-8xl mx-auto px-6 pt-6 pb-4 relative overflow-hidden">
           
@@ -57,7 +56,7 @@ export default function Home() {
         </section>
       )}
 
-      {/* Main Page Sections */}
+     
       <Hero />
       <Features />
       <Steps />

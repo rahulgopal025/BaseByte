@@ -2,7 +2,7 @@ import React from "react";
 import { BookOpen, Terminal, Rocket, ChevronRight, Zap } from "lucide-react";
 
 export default function Steps() {
-  // Step data with distinct neon color themes for each stage
+  
   const journey = [
     {
       id: "01",
@@ -32,13 +32,13 @@ export default function Steps() {
 
   return (
     <section className="py-24 bg-[#050505] relative overflow-hidden">
-      {/* Background ambient glows to match the brand aesthetic */}
+    
       <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-indigo-600/5 blur-[120px] -z-0"></div>
       <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-purple-600/5 blur-[120px] -z-0"></div>
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         
-        {/* Section Header with Gradient Mastery text */}
+        
         <div className="text-center mb-24">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-indigo-400 text-xs font-bold tracking-widest uppercase mb-6">
             <Zap size={14} fill="currentColor" /> Process
@@ -49,7 +49,7 @@ export default function Steps() {
         </div>
 
         <div className="relative grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-8">
-          {/* Desktop connecting dashed line with subtle visibility */}
+          
           <div className="hidden md:block absolute top-[25%] left-0 w-full h-0.5 border-t border-dashed border-white/10 -z-0"></div>
 
           {journey.map((step, index) => (
