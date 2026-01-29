@@ -1,0 +1,42 @@
+[
+  {
+    "title": "Reverse a String",
+    "description": "Write a function that reverses a string. The input string is given as an array of characters.",
+    "difficulty": "Easy",
+    "language": "python",
+    "tags": ["strings", "basics"],
+    "sampleInput": "hello",
+    "sampleOutput": "olleh",
+    "testCases": [
+      { "input": "hello", "output": "olleh" },
+      { "input": "BaseByte", "output": "etyBesaB" }
+    ]
+  },
+  {
+    "title": "Fibonacci Number",
+    "description": "The Fibonacci numbers, commonly denoted F(n) form a sequence, such that each number is the sum of the two preceding ones, starting from 0 and 1.",
+    "difficulty": "Medium",
+    "language": "c",
+    "tags": ["math", "recursion"],
+    "sampleInput": "4",
+    "sampleOutput": "3",
+    "testCases": [
+      { "input": "2", "output": "1" },
+      { "input": "3", "output": "2" },
+      { "input": "4", "output": "3" }
+    ]
+  },
+  {
+    "title": "Find Maximum in Array",
+    "description": "Given an array of integers, find the largest element in it.",
+    "difficulty": "Easy",
+    "language": "java",
+    "tags": ["arrays"],
+    "sampleInput": "1 5 3 9 2",
+    "sampleOutput": "9",
+    "testCases": [
+      { "input": "1 5 3 9 2", "output": "9" },
+      { "input": "10 20 5", "output": "20" }
+    ]
+  }
+]

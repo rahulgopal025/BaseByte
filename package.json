@@ -1,0 +1,22 @@
+{
+  "name": "basebyte-fullstack",
+  "version": "1.0.0",
+  "description": "BaseByte: Coding Foundation for 11th-12th Students",
+  "main": "index.js",
+  "scripts": {
+    "start-frontend": "cd frontend && npm run dev",
+    "start-backend": "cd backend && node index.js",
+    "dev": "concurrently \"npm run start-frontend\" \"npm run start-backend\""
+  },
+  "keywords": [],
+  "author": "Rahul Gopal",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/canvas-confetti": "^1.9.0",
+    "@types/prismjs": "^1.26.5",
+    "concurrently": "^9.2.1"
+  },
+  "dependencies": {
+    "canvas-confetti": "^1.9.4"
+  }
+}
