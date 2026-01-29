@@ -31,7 +31,7 @@ export default function Compiler() {
   setOutput("Compiling your code... ⚙️");
 
   try {
-    const response = await axios.post("http://localhost:5000/run", { 
+    const response = await axios.post("https://basebyte-sl12.onrender.com/run", { 
       code, 
       language, 
       input  
@@ -70,7 +70,7 @@ export default function Compiler() {
       
       <div className="w-full lg:w-[60%] h-[75vh] lg:h-full border-r border-white/5 flex flex-col overflow-hidden focus-within:outline-none">
         
-        {/* Toolbar with Language Selector and Controls */}
+        
         <div className="bg-[#111114] p-3 flex flex-shrink-0 justify-between items-center px-4 md:px-6 border-b border-white/5 z-10 focus-within:outline-none focus:outline-none">
           <div className="flex items-center gap-2">
             <LanguageSelector 
@@ -118,7 +118,6 @@ export default function Compiler() {
         />
       </div>
 
-      {/* Console Section with Input/Output Tabs */}
       <div className="w-full lg:w-[40%] h-[45vh] lg:h-full bg-[#050505] flex flex-col">
         <Console 
            output={output} 

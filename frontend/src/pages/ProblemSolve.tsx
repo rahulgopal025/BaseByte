@@ -13,7 +13,7 @@ export default function ProblemSolve() {
   useEffect(() => {
     const fetchProblem = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/problems/${id}`);
+        const res = await axios.get(`https://basebyte-sl12.onrender.com/api/problems/${id}`);
         setProblem(res.data.data || res.data);
       } catch (err) {
         console.error("Error");

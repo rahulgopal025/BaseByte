@@ -14,7 +14,7 @@ export default function ProblemCard({ problem }: any) {
   return (
     <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all font-['Public_Sans',_sans-serif]">
       <div className="flex justify-between items-start mb-4">
-        {/* Icon box similar to your college dashboard style */}
+        
         <div className="p-2 bg-slate-50 rounded-lg">
           <Terminal className="h-5 w-5 text-slate-500" />
         </div>
@@ -33,7 +33,7 @@ export default function ProblemCard({ problem }: any) {
           ))}
         </div>
         
-        {/* Simple button syntax just like your handleUpdate logic */}
+        
         <button 
           onClick={() => navigate(`/practice/${problem._id}`)}
           className="text-blue-600 hover:text-blue-700 font-bold text-sm flex items-center gap-1 transition-colors"

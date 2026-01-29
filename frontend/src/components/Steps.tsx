@@ -62,7 +62,7 @@ export default function Steps() {
                     {step.id}
                   </div>
                   
-                  {/* Floating Icon Card with dynamic gradient backgrounds */}
+                  
                   <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-gradient-to-br ${step.color} rounded-3xl shadow-2xl ${step.glow} border border-white/20 flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
                     {step.icon}
                   </div>
@@ -78,7 +78,6 @@ export default function Steps() {
                   </p>
                 </div>
 
-                {/* Mobile Flow Indicator */}
                 {index < journey.length - 1 && (
                   <div className="md:hidden mt-10 text-indigo-500/50 animate-pulse">
                     <ChevronRight size={32} className="rotate-90" />

@@ -83,7 +83,7 @@ export default function Navbar() {
         </div>
       </div>
 
-       {/* Mobile Menu Dropdown  */}
+       
       {isOpen && (
         <div className="md:hidden bg-[#0A0A0C]/95 backdrop-blur-2xl border-b border-white/5 p-6 space-y-6 shadow-2xl animate-in slide-in-from-top duration-300">
             {user ? (

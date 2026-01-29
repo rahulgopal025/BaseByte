@@ -3,7 +3,7 @@ import { Clock, CheckCircle2, XCircle } from "lucide-react";
 export default function SubmissionHistory({ submissions }: any) {
   return (
     <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden font-['Public_Sans',_sans-serif]">
-      {/* Title bar similar to your "Modify College Information" header */}
+     
       <div className="px-6 py-4 border-b bg-slate-50/50">
         <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Your Recent Activity</h3>
       </div>

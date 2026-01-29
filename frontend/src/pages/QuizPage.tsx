@@ -16,7 +16,7 @@ const QuizPage = () => {
   useEffect(() => {
     const fetchQuizzes = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/quizzes/${lang}/${topic}`);
+        const res = await axios.get(`https://basebyte-sl12.onrender.com/api/quizzes/${lang}/${topic}`);
         setQuestions(res.data);
         setLoading(false);
       } catch (err) {

@@ -17,7 +17,7 @@ const LanguageSelector: React.FC<Props> = ({ language, setLanguage, onLanguageCh
 
   return (
     <div className="relative group">
-      {/* Icon and Label Decoration */}
+      
       <div className="absolute left-3 top-1/2 -translate-y-1/2 text-indigo-500 pointer-events-none group-hover:text-indigo-400 transition-colors">
         <Code2 size={14} />
       </div>
@@ -35,7 +35,7 @@ const LanguageSelector: React.FC<Props> = ({ language, setLanguage, onLanguageCh
         <option value="java">Java</option>
       </select>
 
-      {/* Custom Dropdown Arrow */}
+      
       <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none group-hover:text-indigo-400 transition-colors">
         <ChevronDown size={14} />
       </div>

@@ -32,7 +32,7 @@ export default function Auth() {
     const payload = isLogin ? { email, password } : { name, email, password };
 
     try {
-      const response = await axios.post(`http://localhost:5000${endpoint}`, payload);
+      const response = await axios.post(`https://basebyte-sl12.onrender.com${endpoint}`, payload);
       if (response.data.status === "success") {
         login(response.data.user);
         navigate("/");

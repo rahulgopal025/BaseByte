@@ -70,7 +70,7 @@ const CodeEditor: React.FC<Props> = ({ code, setCode, fontSize, language, errorL
         />
 
         <div className="flex-1 overflow-auto relative custom-editor">
-          {/* Synchronized Error Highlight Overlay */}
+          
           {errorLine && errorLine > 0 && (
             <div 
               style={{

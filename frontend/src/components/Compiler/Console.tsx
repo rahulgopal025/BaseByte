@@ -19,7 +19,7 @@ const Console: React.FC<ConsoleProps> = ({ output, status, input, setInput }) =>
 
   return (
     <div className="flex-1 flex flex-col bg-[#050505] overflow-hidden">
-      {/* --- Tabs Header --- */}
+     
       <div className="flex border-b border-white/5 bg-[#0a0a0b]">
         <button
           onClick={() => setActiveTab("output")}
@@ -39,7 +39,7 @@ const Console: React.FC<ConsoleProps> = ({ output, status, input, setInput }) =>
         </button>
       </div>
 
-      {/* --- Content Area --- */}
+      
       <div className="flex-1 overflow-auto p-6 font-mono text-sm leading-relaxed">
         {activeTab === "input" ? (
           <div className="h-full flex flex-col">
@@ -55,7 +55,7 @@ const Console: React.FC<ConsoleProps> = ({ output, status, input, setInput }) =>
           <div className="space-y-4">
             {status === "error" ? (
               <div className="space-y-4">
-                {/* Technical Error Card */}
+                
                 <div className="bg-red-500/5 border border-red-500/20 rounded-xl p-4">
                   <div className="flex items-center gap-2 text-red-500 text-[10px] font-bold uppercase mb-2">
                     <AlertCircle size={14} /> Technical Error (Line {lineNum})
@@ -63,7 +63,7 @@ const Console: React.FC<ConsoleProps> = ({ output, status, input, setInput }) =>
                   <pre className="text-red-400/80 whitespace-pre-wrap break-all">{rawError}</pre>
                 </div>
 
-                {/* BaseByte Hint Card */}
+                
                 <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-5 relative overflow-hidden group">
                   <div className="flex items-center gap-2 text-indigo-400 text-[10px] font-bold uppercase mb-3">
                     <Lightbulb size={14} className="animate-pulse" /> BaseByte Hint

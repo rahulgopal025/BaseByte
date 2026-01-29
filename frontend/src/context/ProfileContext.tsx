@@ -10,7 +10,7 @@ export const ProfileProvider = ({ children }: { children: React.ReactNode }) => 
   const fetchProfile = async (email: string) => {
     setIsLoading(true);
     try {
-      const res = await axios.get(`http://localhost:5000/api/profile/${email}`);
+      const res = await axios.get(`https://basebyte-sl12.onrender.com/api/profile/${email}`);
       if (res.data.profile) {
         setProfileData(res.data.profile);
       }
@@ -23,7 +23,7 @@ export const ProfileProvider = ({ children }: { children: React.ReactNode }) => 
 
   const saveProfile = async (data: any) => {
     try {
-      const res = await axios.post("http://localhost:5000/api/profile/save", data);
+      const res = await axios.post("https://basebyte-sl12.onrender.com/api/profile/save", data);
       if (res.data.success) {
         setProfileData(res.data.profile);
         return true;
