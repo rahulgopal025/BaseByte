@@ -100,5 +100,5 @@ app.use("/api/problems", problemRoutes);
 app.use("/api/quizzes", quizRoutes); 
 app.use("/api/profile", profileRoutes); 
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Entry Point active on port ${PORT}`));
