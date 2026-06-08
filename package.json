@@ -1,7 +1,7 @@
 {
   "name": "basebyte-fullstack",
   "version": "1.0.0",
-  "description": "BaseByte: Coding Foundation for 11th-12th Students",
+  "description": "BaseByte: Coding Foundation for Future Developers",
   "main": "index.js",
   "scripts": {
     "start-frontend": "cd frontend && npm run dev",
