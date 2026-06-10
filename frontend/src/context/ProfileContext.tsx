@@ -1,35 +1,60 @@
 import React, { createContext, useContext, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../api/axios.instance";
+import { API_ENDPOINTS } from "../constants/api.constants";
 
-const ProfileContext = createContext<any>(null);
+interface ProfileData {
+  _id?: string;
+  userId?: string;
+  firstName?: string;
+  midName?: string;
+  lastName?: string;
+  college?: string;
+  address?: string;
+  mobile?: string;
+  degree?: string;
+  github?: string;
+  linkedin?: string;
+  website?: string;
+  avatar?: string;
+}
+
+interface ProfileContextType {
+  profileData: ProfileData | null;
+  setProfileData: React.Dispatch<React.SetStateAction<ProfileData | null>>;
+  fetchProfile: () => Promise<void>;
+  saveProfile: (data: Record<string, unknown>) => Promise<boolean>;
+  isLoading: boolean;
+}
+
+const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
 
 export const ProfileProvider = ({ children }: { children: React.ReactNode }) => {
-  const [profileData, setProfileData] = useState<any>(null);
+  const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchProfile = async (email: string) => {
+  const fetchProfile = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.get(`https://basebyte-sl12.onrender.com/api/profile/${email}`);
-      if (res.data.profile) {
-        setProfileData(res.data.profile);
+      const res = await axiosInstance.get(`${API_ENDPOINTS.PROFILE}/me`);
+      if (res.data.data) {
+        setProfileData(res.data.data);
       }
-    } catch (error) {
-      console.error(error);
+    } catch {
+      // Profile not found or not logged in — fail silently
     } finally {
       setIsLoading(false);
     }
   };
 
-  const saveProfile = async (data: any) => {
+  const saveProfile = async (data: Record<string, unknown>): Promise<boolean> => {
     try {
-      const res = await axios.post("https://basebyte-sl12.onrender.com/api/profile/save", data);
-      if (res.data.success) {
-        setProfileData(res.data.profile);
+      const res = await axiosInstance.post(`${API_ENDPOINTS.PROFILE}/save`, data);
+      if (res.data.data) {
+        setProfileData(res.data.data);
         return true;
       }
-    } catch (error) {
-      console.error(error);
+      return false;
+    } catch {
       return false;
     }
   };
@@ -41,4 +66,8 @@ export const ProfileProvider = ({ children }: { children: React.ReactNode }) => 
   );
 };
 
-export const useProfile = () => useContext(ProfileContext);
+export const useProfile = () => {
+  const context = useContext(ProfileContext);
+  if (!context) throw new Error("useProfile must be used within ProfileProvider");
+  return context;
+};

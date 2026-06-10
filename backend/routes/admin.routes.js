@@ -1,64 +1,45 @@
-const express = require('express');
+import express from 'express';
+import Enrollment from '../models/Enrollment.js';
+import Lecture from '../models/Lecture.js';
+import User from '../models/User.js';
+import { verifyToken } from '../middleware/auth.middleware.js';
+import { verifyAdmin } from '../middleware/admin.middleware.js';
+import asyncHandler from '../utils/asyncHandler.js';
+import ApiResponse from '../utils/ApiResponse.js';
+
 const router = express.Router();
-const Enrollment = require('../models/Enrollment');
-const Lecture = require('../models/Lecture');
 
-router.post('/enroll/request', async (req, res) => {
-  try {
-    const { userId, userEmail, courseId } = req.body;
-    const newRequest = new Enrollment({ userId, userEmail, courseId });
-    await newRequest.save();
-    res.status(200).json({ success: true });
-  } catch (error) {
-    res.status(500).json({ success: false });
-  }
-});
+// All admin routes require auth + admin
+router.use(verifyToken, verifyAdmin);
 
-router.get('/enroll/pending', async (req, res) => {
-  try {
-    const pending = await Enrollment.find({ status: 'pending' });
-    res.status(200).json({ success: true, data: pending });
-  } catch (error) {
-    res.status(500).json({ success: false });
-  }
-});
+// Enrollment management
+router.get('/enrollments/pending', asyncHandler(async (req, res) => {
+  const pending = await Enrollment.find({ status: 'pending' }).sort({ enrolledAt: -1 });
+  res.json(new ApiResponse(200, pending, 'Pending enrollments fetched.'));
+}));
 
-router.put('/enroll/status', async (req, res) => {
-  try {
-    const { requestId, status } = req.body;
-    const updated = await Enrollment.findByIdAndUpdate(requestId, { status }, { new: true });
-    res.status(200).json({ success: true, updated });
-  } catch (error) {
-    res.status(500).json({ success: false });
-  }
-});
+router.put('/enrollments/status', asyncHandler(async (req, res) => {
+  const { requestId, status } = req.body;
+  const updated = await Enrollment.findByIdAndUpdate(requestId, { status }, { new: true });
+  res.json(new ApiResponse(200, updated, 'Enrollment status updated.'));
+}));
 
-router.get('/my-courses/:email', async (req, res) => {
-    try {
-      const courses = await Enrollment.find({ userEmail: req.params.email, status: 'approved' });
-      res.status(200).json({ success: true, courses });
-    } catch (error) {
-      res.status(500).json({ success: false });
-    }
-});
+// Lecture management
+router.post('/lectures/add', asyncHandler(async (req, res) => {
+  const newLecture = new Lecture(req.body);
+  await newLecture.save();
+  res.status(201).json(new ApiResponse(201, newLecture, 'Lecture added.'));
+}));
 
-router.post('/lectures/add', async (req, res) => {
-  try {
-    const newLecture = new Lecture(req.body);
-    await newLecture.save();
-    res.status(200).json({ success: true });
-  } catch (error) {
-    res.status(500).json({ success: false });
-  }
-});
+router.get('/lectures/all', asyncHandler(async (req, res) => {
+  const lectures = await Lecture.find().sort({ order: 1 });
+  res.json(new ApiResponse(200, lectures, 'Lectures fetched.'));
+}));
 
-router.get('/lectures/all', async (req, res) => {
-  try {
-    const lectures = await Lecture.find().sort({ day: 1 });
-    res.status(200).json({ success: true, lectures });
-  } catch (error) {
-    res.status(500).json({ success: false });
-  }
-});
+// Student management
+router.get('/students', asyncHandler(async (req, res) => {
+  const students = await User.find({ role: 'student' }).select('-password');
+  res.json(new ApiResponse(200, students, 'Students fetched.'));
+}));
 
-module.exports = router;
+export default router;

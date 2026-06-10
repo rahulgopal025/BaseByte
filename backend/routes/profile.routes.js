@@ -1,28 +1,10 @@
-const express = require('express');
+import express from 'express';
+import { saveProfile, getProfile } from '../controllers/profile.controller.js';
+import { verifyToken } from '../middleware/auth.middleware.js';
+
 const router = express.Router();
-const UserProfile = require('../models/UserProfile');
 
-router.post('/save', async (req, res) => {
-  try {
-    const { email } = req.body;
-    const profile = await UserProfile.findOneAndUpdate(
-      { email },
-      req.body,
-      { upsert: true, new: true }
-    );
-    res.status(200).json({ success: true, profile });
-  } catch (error) {
-    res.status(500).json({ success: false });
-  }
-});
+router.post('/save', verifyToken, saveProfile);
+router.get('/me', verifyToken, getProfile);
 
-router.get('/:email', async (req, res) => {
-  try {
-    const profile = await UserProfile.findOne({ email: req.params.email });
-    res.status(200).json({ success: true, profile });
-  } catch (error) {
-    res.status(500).json({ success: false });
-  }
-});
-
-module.exports = router;
+export default router;
