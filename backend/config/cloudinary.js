@@ -1,4 +1,12 @@
-// Phase 2 — To be implemented
-// Will configure Cloudinary SDK for image/video uploads
+import cloudinary from 'cloudinary';
 
-export default {};
+// Configure Cloudinary SDK
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+export default cloudinary;
+
+

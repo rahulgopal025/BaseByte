@@ -11,3 +11,4 @@ router.get('/', verifyToken, getAllNotes);
 router.put('/approve/:id', verifyToken, verifyAdmin, approveNotes);
 
 export default router;
+
