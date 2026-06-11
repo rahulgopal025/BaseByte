@@ -15,7 +15,7 @@ export default function About() {
       <div className="max-w-7xl mx-auto relative z-10">
         
         
-        <div className="flex justify-center mb-15 ">
+        <div className="flex justify-center mb-16">
           <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-1.5 rounded-[2rem] flex items-center gap-2 shadow-2xl">
             <button 
               onClick={() => setActiveTab("platform")}

@@ -1,39 +1,36 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { ROUTES } from "./constants/routes.constants";
-
-// Layouts & Common
-import Navbar from "./components/layout/Navbar";
-import Footer from "./components/layout/Footer";
-import AdminLayout from "./components/layout/AdminLayout";
+import { AuthProvider } from "./context/AuthContext";
+import { ProfileProvider } from "./context/ProfileContext";
+import { ToastProvider } from "./context/ToastContext";
 import ErrorBoundary from "./components/common/ErrorBoundary";
-import NotFound from "./components/common/NotFound";
+
+// Layouts
+import UserLayout from "./components/layout/UserLayout";
+import AdminLayout from "./components/layout/AdminLayout";
 
 // Guards
 import ProtectedRoute from "./components/guards/ProtectedRoute";
 import AdminRoute from "./components/guards/AdminRoute";
 import GuestRoute from "./components/guards/GuestRoute";
 
-// Providers
-import { AuthProvider } from "./context/AuthContext";
-import { ProfileProvider } from "./context/ProfileContext";
-
 // User Pages
 import Home from "./pages/user/Home";
+import Auth from "./pages/user/Auth";
+import About from "./pages/user/About";
 import Practice from "./pages/user/Practice";
 import Compiler from "./pages/user/Compiler";
-import About from "./pages/user/About";
-import Auth from "./pages/user/Auth";
 import ProblemDetails from "./pages/user/ProblemDetails";
 import ProblemSolve from "./pages/user/ProblemSolve";
-import ProfilePage from "./pages/user/ProfilePage";
-import QuizPage from "./pages/user/QuizPage";
 import Topics from "./pages/user/Topics";
+import QuizPage from "./pages/user/QuizPage";
+import ProfilePage from "./pages/user/ProfilePage";
 import Courses from "./pages/user/Courses";
 import CourseDetails from "./pages/user/CourseDetails";
 import CourseLearning from "./pages/user/CourseLearning";
 import Notes from "./pages/user/Notes";
 import Checkout from "./pages/user/Checkout";
 import Feedback from "./pages/user/Feedback";
+import NotFound from "./components/common/NotFound";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -50,64 +47,60 @@ export default function App() {
     <ErrorBoundary>
       <AuthProvider>
         <ProfileProvider>
-          <div className="flex flex-col min-h-screen bg-[#050505]">
+          <ToastProvider>
             <Routes>
-              {/* ADMIN ROUTES */}
-              <Route path={ROUTES.ADMIN} element={<AdminRoute><AdminLayout /></AdminRoute>}>
-                <Route index element={<AdminDashboard />} />
-                <Route path="courses" element={<AdminCourses />} />
-                <Route path="lectures" element={<AdminLectures />} />
-                <Route path="students" element={<AdminStudents />} />
-                <Route path="enrollments" element={<AdminEnrollments />} />
-                <Route path="problems" element={<AdminProblems />} />
-                <Route path="feedback" element={<AdminFeedback />} />
-                <Route path="notes" element={<AdminNotes />} />
+
+              {/* USER ROUTES — with Navbar and Footer */}
+              <Route element={<UserLayout />}>
+
+                {/* Public */}
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/compiler" element={<Compiler />} />
+                <Route path="/courses" element={<Courses />} />
+
+                {/* Guest only — redirect to / if already logged in */}
+                <Route element={<GuestRoute />}>
+                  <Route path="/auth" element={<Auth />} />
+                </Route>
+                <Route path="/login" element={<Navigate to="/auth" replace />} />
+                <Route path="/signup" element={<Navigate to="/auth" replace />} />
+
+                {/* Protected — redirect to /auth if not logged in */}
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/practice" element={<Practice />} />
+                  <Route path="/practice/:id" element={<ProblemDetails />} />
+                  <Route path="/solve/:id" element={<ProblemSolve />} />
+                  <Route path="/topics/:lang" element={<Topics />} />
+                  <Route path="/quiz/:lang/:topic" element={<QuizPage />} />
+                  <Route path="/profile" element={<ProfilePage />} />
+                  <Route path="/courses/:id" element={<CourseDetails />} />
+                  <Route path="/courses/:id/learn" element={<CourseLearning />} />
+                  <Route path="/notes" element={<Notes />} />
+                  <Route path="/checkout/:id" element={<Checkout />} />
+                  <Route path="/feedback" element={<Feedback />} />
+                </Route>
+
+                {/* 404 */}
+                <Route path="*" element={<NotFound />} />
               </Route>
 
-              {/* USER ROUTES (with Navbar & Footer) */}
-              <Route
-                path="*"
-                element={
-                  <>
-                    <Navbar />
-                    <main className="flex-1 pt-16">
-                      <Routes>
-                        {/* Public Routes */}
-                        <Route path={ROUTES.HOME} element={<Home />} />
-                        <Route path={ROUTES.ABOUT} element={<About />} />
-                        <Route path={ROUTES.PRACTICE} element={<Practice />} />
-                        <Route path={ROUTES.COMPILER} element={<Compiler />} />
-                        <Route path={ROUTES.COURSES} element={<Courses />} />
-                        <Route path={ROUTES.COURSE_DETAILS} element={<CourseDetails />} />
-                        
-                        {/* Guest Only (Login/Signup) */}
-                        <Route path={ROUTES.AUTH} element={<GuestRoute><Auth /></GuestRoute>} />
+              {/* ADMIN ROUTES — with AdminLayout, no Navbar/Footer */}
+              <Route element={<AdminRoute />}>
+                <Route element={<AdminLayout />}>
+                  <Route path="/admin" element={<AdminDashboard />} />
+                  <Route path="/admin/courses" element={<AdminCourses />} />
+                  <Route path="/admin/lectures" element={<AdminLectures />} />
+                  <Route path="/admin/students" element={<AdminStudents />} />
+                  <Route path="/admin/enrollments" element={<AdminEnrollments />} />
+                  <Route path="/admin/problems" element={<AdminProblems />} />
+                  <Route path="/admin/feedback" element={<AdminFeedback />} />
+                  <Route path="/admin/notes" element={<AdminNotes />} />
+                </Route>
+              </Route>
 
-                        {/* Protected Routes */}
-                        <Route path={ROUTES.PROBLEM_DETAILS} element={<ProtectedRoute><ProblemDetails /></ProtectedRoute>} />
-                        <Route path={ROUTES.PROBLEM_SOLVE} element={<ProtectedRoute><ProblemSolve /></ProtectedRoute>} />
-                        <Route path={ROUTES.TOPICS} element={<ProtectedRoute><Topics /></ProtectedRoute>} />
-                        <Route path={ROUTES.QUIZ} element={<ProtectedRoute><QuizPage /></ProtectedRoute>} />
-                        <Route path={ROUTES.PROFILE} element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-                        <Route path={ROUTES.COURSE_LEARNING} element={<ProtectedRoute><CourseLearning /></ProtectedRoute>} />
-                        <Route path={ROUTES.NOTES} element={<ProtectedRoute><Notes /></ProtectedRoute>} />
-                        <Route path={ROUTES.CHECKOUT} element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
-                        <Route path={ROUTES.FEEDBACK} element={<ProtectedRoute><Feedback /></ProtectedRoute>} />
-
-                        {/* Redirect /login and /signup to /auth */}
-                        <Route path={ROUTES.LOGIN} element={<Navigate to={ROUTES.AUTH} replace />} />
-                        <Route path={ROUTES.SIGNUP} element={<Navigate to={ROUTES.AUTH} replace />} />
-
-                        {/* 404 Not Found */}
-                        <Route path={ROUTES.NOT_FOUND} element={<NotFound />} />
-                      </Routes>
-                    </main>
-                    <Footer />
-                  </>
-                }
-              />
             </Routes>
-          </div>
+          </ToastProvider>
         </ProfileProvider>
       </AuthProvider>
     </ErrorBoundary>

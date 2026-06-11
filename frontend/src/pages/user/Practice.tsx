@@ -1,8 +1,21 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronRight, Code2, Terminal, Coffee } from "lucide-react";
+import { useProblems } from "../../hooks/useProblems";
+import ProblemCard from "../../components/practice/ProblemCard";
 
 export default function Practice() {
   const navigate = useNavigate();
+  const { problems, loading, fetchProblems } = useProblems();
+  const [difficultyFilter, setDifficultyFilter] = useState("All");
+
+  useEffect(() => {
+    fetchProblems();
+  }, [fetchProblems]);
+
+  const filteredProblems = difficultyFilter === "All" 
+    ? problems 
+    : problems.filter((p: any) => p.difficulty === difficultyFilter);
 
   // Configuration for language selection cards
   const languages = [
@@ -81,6 +94,53 @@ export default function Practice() {
               <div className="absolute bottom-0 right-0 w-24 h-24 bg-indigo-500/5 blur-[40px] rounded-full group-hover:bg-indigo-500/10 transition-colors"></div>
             </div>
           ))}
+        </div>
+
+        {/* Problems List Section */}
+        <div className="mt-20">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+            <div>
+              <h2 className="text-3xl font-black text-white tracking-tighter mb-2">Coding Challenges</h2>
+              <p className="text-zinc-500 text-sm font-medium">Solve algorithmic problems to improve your logic.</p>
+            </div>
+            
+            {/* Filter Tabs */}
+            <div className="flex bg-[#0A0A0C] border border-white/5 p-1 rounded-xl w-fit">
+              {['All', 'Easy', 'Medium', 'Hard'].map((diff) => (
+                <button
+                  key={diff}
+                  onClick={() => setDifficultyFilter(diff)}
+                  className={`px-6 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${
+                    difficultyFilter === diff 
+                      ? 'bg-indigo-600 text-white shadow-lg' 
+                      : 'text-zinc-500 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  {diff}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {loading ? (
+            <div className="grid grid-cols-1 gap-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-24 w-full bg-zinc-900 rounded-2xl animate-pulse border border-white/5" />
+              ))}
+            </div>
+          ) : filteredProblems.length > 0 ? (
+            <div className="grid grid-cols-1 gap-4">
+              {filteredProblems.map((problem: any) => (
+                <ProblemCard key={problem._id} problem={problem} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-16 bg-[#0A0A0C] rounded-3xl border border-white/5">
+              <Code2 className="w-12 h-12 text-zinc-700 mx-auto mb-4" />
+              <h3 className="text-white font-bold mb-2">No problems found</h3>
+              <p className="text-zinc-500 text-sm">Try changing your difficulty filter.</p>
+            </div>
+          )}
         </div>
 
       </div>

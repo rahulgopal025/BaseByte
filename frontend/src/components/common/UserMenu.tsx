@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, LogOut, ChevronDown, Settings, Bell, BookOpen } from "lucide-react";
+import { User, LogOut, ChevronDown, BookOpen } from "lucide-react";
 import profileBoy from "../../assets/profile-boy.png";
 import type { User as UserType } from "../../types/auth.types";
 
@@ -13,7 +13,6 @@ export default function UserMenu({ user, onLogout }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
-
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -43,10 +42,8 @@ export default function UserMenu({ user, onLogout }: UserMenuProps) {
         <ChevronDown size={16} className={`text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
       </div>
 
-
       {isOpen && (
-        <div className="fixed right-4 md:right-8 top-20 w-72 bg-[#0A0A0C]/90 bg-gray-900 text-white backdrop-blur-xl border border-white/10 rounded-[2.5rem] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] py-6 z-[100] animate-in fade-in slide-in-from-right-5 duration-300">
-
+        <div className="fixed right-4 md:right-8 top-20 w-72 bg-[#0A0A0C]/95 backdrop-blur-xl border border-white/10 rounded-[2.5rem] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] py-6 z-[100] animate-in fade-in slide-in-from-right-5 duration-300">
 
           <div className="px-7 pb-5 border-b border-white/5 mb-4">
             <div className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[9px] font-black text-indigo-400 uppercase tracking-[0.15em] mb-3">
@@ -60,7 +57,6 @@ export default function UserMenu({ user, onLogout }: UserMenuProps) {
             </p>
           </div>
 
-
           <div className="px-3 space-y-1.5">
             <button
               onClick={() => { navigate("/profile"); setIsOpen(false); }}
@@ -73,31 +69,14 @@ export default function UserMenu({ user, onLogout }: UserMenuProps) {
             </button>
 
             <button
-              onClick={() => { navigate("/settings"); setIsOpen(false); }}
+              onClick={() => { navigate("/courses"); setIsOpen(false); }}
               className="w-full flex items-center gap-4 px-5 py-3 text-sm font-bold text-gray-400 hover:text-white hover:bg-white/5 rounded-2xl transition-all group"
             >
-              <div className="p-2 bg-white/5 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                <Settings size={18} />
-              </div>
-              Settings
-            </button>
-
-            <button
-              className="w-full flex items-center gap-4 px-5 py-3 text-sm font-bold text-gray-400 hover:text-white hover:bg-white/5 rounded-2xl transition-all group"
-            >
-              <div className="p-2 bg-white/5 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                <Bell size={18} />
-              </div>
-              Notifications
-            </button>
-
-            <button className="w-full flex items-center gap-4 px-5 py-3 text-sm font-bold text-gray-400 hover:text-white hover:bg-white/5 rounded-2xl transition-all group">
               <div className="p-2 bg-white/5 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-all">
                 <BookOpen size={18} />
               </div>
-              My Course
+              My Courses
             </button>
-
 
             <div className="h-px bg-white/5 mx-6 my-4"></div>
 

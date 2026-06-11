@@ -22,7 +22,16 @@ export default function ProblemDetails() {
     fetchProblem();
   }, [id]);
 
-  if (loading) return <div className="min-h-screen bg-[#050505] flex items-center justify-center text-zinc-500 font-black uppercase tracking-[0.3em] text-xs">Loading Problem...</div>;
+  if (loading) return (
+    <div className="min-h-screen bg-[#050505] p-8 md:p-16">
+      <div className="max-w-4xl mx-auto space-y-4">
+        <div className="h-10 w-64 bg-zinc-800 rounded-2xl animate-pulse" />
+        <div className="h-6 w-full bg-zinc-800/60 rounded-xl animate-pulse" />
+        <div className="h-6 w-3/4 bg-zinc-800/60 rounded-xl animate-pulse" />
+        <div className="h-48 w-full bg-zinc-800/40 rounded-2xl animate-pulse mt-8" />
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-[#050505] text-white p-6 md:p-12 font-['Public_Sans',_sans-serif]">

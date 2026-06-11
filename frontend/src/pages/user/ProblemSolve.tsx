@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getProblemById } from "../../api/problem.api";
-import { ChevronLeft, Info, Terminal, Settings, Play, RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
+import { ChevronLeft, Info, Terminal, Play, RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
 import LanguageSelector from "../../components/Compiler/LanguageSelector";
 import CodeEditor from "../../components/Compiler/CodeEditor";
 import Console from "../../components/Compiler/Console";

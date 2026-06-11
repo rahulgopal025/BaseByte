@@ -72,19 +72,26 @@ export default function Hero(){
             </div>
             
             
-            <div className="font-mono text-sm space-y-2 text-indigo-300">
-              <p><span className="text-purple-400">void</span> <span className="text-yellow-400">main</span>() &#123;</p>
-              <p className="pl-4 text-gray-500">// Your coding journey starts here</p>
-              <p className="pl-4">
-                <span className="text-blue-400">printf</span>(
-                <span className="text-green-400">"Welcome to BaseByte!"</span>
-                );
-              </p>
-              <p className="pl-4"><span className="text-purple-400">if</span> (passion == <span className="text-orange-400">true</span>) &#123;</p>
-              <p className="pl-8 text-blue-400">startLearning();</p>
-              <p className="pl-4">&#125;</p>
-              <p>&#125;</p>
-            </div>
+            <pre className="text-sm font-mono leading-relaxed text-gray-300">
+            <code>
+              <span className="text-gray-500">// Master the logic.</span>
+              <br />
+              <span className="text-pink-400">#include</span>{" "}
+              <span className="text-green-400">{"<stdio.h>"}</span>
+              <br />
+              <br />
+              <span className="text-purple-400">int</span>{" "}
+              <span className="text-blue-400">main</span>() {"{"}
+              <br />
+              {"  "}printf(
+              <span className="text-yellow-300">"Hello, World!"</span>);
+              <br />
+              {"  "}<span className="text-purple-400">return</span>{" "}
+              <span className="text-yellow-300">0</span>;
+              <br />
+              {"}"}
+            </code>
+          </pre>
           </div>
 
           

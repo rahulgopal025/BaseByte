@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axiosInstance from "../../api/axios.instance";
 import { API_ENDPOINTS } from "../../constants/api.constants";
+import { Play, RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
 
 import LanguageSelector from "../../components/Compiler/LanguageSelector";
 import CodeEditor from "../../components/Compiler/CodeEditor";

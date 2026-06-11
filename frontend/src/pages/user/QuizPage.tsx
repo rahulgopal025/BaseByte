@@ -54,7 +54,16 @@ const QuizPage = () => {
     }
   };
 
-  if (loading) return <div className="text-white p-6 text-xs font-bold uppercase">Loading...</div>;
+  if (loading) return (
+    <div className="min-h-screen bg-[#050505] p-8 md:p-16">
+      <div className="max-w-4xl mx-auto space-y-4">
+        <div className="h-10 w-64 bg-zinc-800 rounded-2xl animate-pulse" />
+        <div className="h-6 w-full bg-zinc-800/60 rounded-xl animate-pulse" />
+        <div className="h-6 w-3/4 bg-zinc-800/60 rounded-xl animate-pulse" />
+        <div className="h-48 w-full bg-zinc-800/40 rounded-2xl animate-pulse mt-8" />
+      </div>
+    </div>
+  );
   if (questions.length === 0) return <div className="text-white p-6">No data found.</div>;
 
   const currentQ = questions[currentIndex];

@@ -60,4 +60,6 @@ const submissionSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
+submissionSchema.index({ userId: 1 });
+
 export default mongoose.model('Submission', submissionSchema);

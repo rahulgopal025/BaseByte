@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
-require("dotenv").config();
-const Quiz = require("./models/Quiz");
+require("dotenv").config({ path: '../.env' });
+const Quiz = require("../models/Quiz.js");
 
 // Import all separate JSON files
-const cData = require("./data/cQuizzes.json");
-const pythonData = require("./data/pythonQuizzes.json");
-const javaData = require("./data/javaQuizzes.json");
+const cData = require("../data/cQuizzes.json");
+const pythonData = require("../data/pythonQuizzes.json");
+const javaData = require("../data/javaQuizzes.json");
 
 const seedData = async () => {
   try {
@@ -21,9 +21,6 @@ const seedData = async () => {
     console.log("✅ All Quizzes Seeded Successfully!");
     process.exit();
 
-    console.log("✅ Database Cleaned and New Quizzes Seeded!");
-    process.exit();
-
   } catch (error) {
     console.error("❌ Seeding Error:", error);
     process.exit(1);
@@ -31,7 +28,3 @@ const seedData = async () => {
 };
 
 seedData();
-
-
-
-

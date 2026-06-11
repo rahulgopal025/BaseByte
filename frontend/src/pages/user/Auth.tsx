@@ -3,11 +3,13 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Mail, Lock, User, ArrowRight, Zap, Eye, EyeOff } from "lucide-react";
 import { signupApi, loginApi } from "../../api/auth.api";
 import { useAuth } from "../../hooks/useAuth";
+import { useToastContext } from "../../context/ToastContext";
 
 export default function Auth() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
+  const { showToast } = useToastContext();
 
   const [isLogin, setIsLogin] = useState<boolean>(
     location.state?.showSignup ? false : true
@@ -30,9 +32,6 @@ export default function Auth() {
     setError("");
     setLoading(true);
 
-    const endpoint = isLogin ? "/login" : "/signup";
-    const payload = isLogin ? { email, password } : { name, email, password };
-
     try {
       let response;
       if (isLogin) {
@@ -43,19 +42,28 @@ export default function Auth() {
 
       if (response.data.success || response.data.status === "success") {
         if (isLogin) {
+          const userData = response.data.data?.user || response.data.user;
+          showToast(`Welcome back, ${userData?.name?.split(' ')[0] || 'User'}!`, 'success');
           login(response.data.data || response.data);
-          navigate("/");
+          
+          if (userData?.role === 'admin') {
+            navigate("/admin");
+          } else {
+            navigate("/");
+          }
         } else {
+          showToast("Account created successfully! Please login.", 'success');
           setIsLogin(true); // Switch to login after signup
           setError("");
         }
       } else {
+        showToast(response.data.message || "Something went wrong!", 'error');
         setError(response.data.message || "Something went wrong!");
       }
     } catch (error: any) {
-      setError(
-        error?.response?.data?.message || "Server error! Please try again."
-      );
+      const errMsg = error?.response?.data?.message || "Server error! Please try again.";
+      showToast(errMsg, 'error');
+      setError(errMsg);
     } finally {
       setLoading(false);
     }

@@ -7,9 +7,4 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
-  
-  optimizeDeps: {
-    include: ['react-resizable-panels'],
-  },
-}
-)
+})

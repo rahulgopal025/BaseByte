@@ -1,9 +1,7 @@
-import { Navigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { Navigate, Outlet } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 
-const GuestRoute = ({ children }: { children: React.ReactNode }) => {
+export default function GuestRoute() {
   const { isAuthenticated } = useAuth();
-  return isAuthenticated ? <Navigate to="/" replace /> : <>{children}</>;
-};
-
-export default GuestRoute;
+  return isAuthenticated ? <Navigate to="/" replace /> : <Outlet />;
+}

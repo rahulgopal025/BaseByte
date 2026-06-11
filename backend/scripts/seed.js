@@ -1,7 +1,7 @@
-require('dotenv').config();
+require('dotenv').config({ path: '../.env' });
 const mongoose = require("mongoose");
-const Problem = require("./models/Problem");
-const problemsData = require("./data/seedProblems.json");
+const Problem = require("../models/Problem.js");
+const problemsData = require("../data/seedProblems.json");
 
 const seedDB = async () => {
   await mongoose.connect(process.env.MONGO_URI);

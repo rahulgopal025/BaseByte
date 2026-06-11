@@ -8,3 +8,5 @@ export const getAllProblems = () => {
 export const getProblemById = (id: string) => {
   return axiosInstance.get(`${API_ENDPOINTS.PROBLEMS}/${id}`);
 };
+
+

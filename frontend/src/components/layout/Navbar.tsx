@@ -39,20 +39,19 @@ export default function Navbar() {
           </div>
 
           
-          {user && (
-            <ul className="hidden md:flex gap-10 items-center font-bold text-sm tracking-widest uppercase">
-              {["/", "/practice", "/compiler", "/courses", "/about"].map((path) => (
-                <li 
-                  key={path}
-                  onClick={() => navigate(path)} 
-                  className={`cursor-pointer hover:text-white transition-all duration-300 relative group ${isActive(path)}`}
-                >
-                  {path === "/" ? "Home" : path.replace("/", "")}
-                  <span className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-500 transition-all duration-300 group-hover:w-full ${location.pathname === path ? "w-full" : ""}`}></span>
-                </li>
-              ))}
-            </ul>
-          )}
+          {/* Navigation Links — Public */}
+          <ul className="hidden md:flex gap-10 items-center font-bold text-sm tracking-widest uppercase">
+            {["/", "/practice", "/compiler", "/courses", "/about"].map((path) => (
+              <li 
+                key={path}
+                onClick={() => navigate(path)} 
+                className={`cursor-pointer hover:text-white transition-all duration-300 relative group ${isActive(path)}`}
+              >
+                {path === "/" ? "Home" : path.replace("/", "")}
+                <span className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-500 transition-all duration-300 group-hover:w-full ${location.pathname === path ? "w-full" : ""}`}></span>
+              </li>
+            ))}
+          </ul>
 
           
           <div className="flex items-center gap-6">
@@ -86,24 +85,24 @@ export default function Navbar() {
        
       {isOpen && (
         <div className="md:hidden bg-[#0A0A0C]/95 backdrop-blur-2xl border-b border-white/5 p-6 space-y-6 shadow-2xl animate-in slide-in-from-top duration-300">
-            {user ? (
-                <div className="flex flex-col gap-6 font-bold text-gray-400 text-lg">
-                  {["Home", "Practice", "Compiler", "Courses", "About"].map((item) => (
-                    <p key={item} onClick={() => {navigate(item === "Home" ? "/" : `/${item.toLowerCase()}`); setIsOpen(false)}} className="hover:text-indigo-400 transition-colors cursor-pointer capitalize">
-                      {item}
-                    </p>
-                  ))}
-                </div>
-            ) : (
-                <div className="flex flex-col gap-4">
-                  <button onClick={() => {navigate("/auth", { state: { showSignup: false } }); setIsOpen(false)}} className="w-full py-4 font-black text-gray-400 border border-white/5 rounded-2xl active:bg-white/5">
-                    LOGIN
-                  </button>
-                  <button onClick={() => {navigate("/auth", { state: { showSignup: true } }); setIsOpen(false)}} className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black shadow-lg shadow-indigo-500/20">
-                    SIGN UP
-                  </button>
-                </div>
-            )}
+          <div className="flex flex-col gap-6 font-bold text-gray-400 text-lg">
+            {["Home", ...(user ? ["Practice"] : []), "Compiler", "Courses", "About"].map((item) => (
+              <p key={item} onClick={() => {navigate(item === "Home" ? "/" : `/${item.toLowerCase()}`); setIsOpen(false)}} className="hover:text-indigo-400 transition-colors cursor-pointer capitalize">
+                {item}
+              </p>
+            ))}
+          </div>
+          
+          {!user && (
+            <div className="flex flex-col gap-4 mt-6 pt-6 border-t border-white/5">
+              <button onClick={() => {navigate("/auth", { state: { showSignup: false } }); setIsOpen(false)}} className="w-full py-4 font-black text-gray-400 border border-white/5 rounded-2xl active:bg-white/5">
+                LOGIN
+              </button>
+              <button onClick={() => {navigate("/auth", { state: { showSignup: true } }); setIsOpen(false)}} className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black shadow-lg shadow-indigo-500/20">
+                SIGN UP
+              </button>
+            </div>
+          )}
         </div>
       )}
     </nav>

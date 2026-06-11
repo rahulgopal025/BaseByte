@@ -14,7 +14,16 @@ export const saveProfile = asyncHandler(async (req, res) => {
 });
 
 export const getProfile = asyncHandler(async (req, res) => {
-  const profile = await UserProfile.findOne({ userId: req.user.id });
+  let profile = await UserProfile.findOne({ userId: req.user.id });
+
+  if (!profile && req.user.email) {
+    profile = await UserProfile.findOne({ email: req.user.email });
+    // Migrate the old profile by setting its userId
+    if (profile) {
+      profile.userId = req.user.id;
+      await profile.save();
+    }
+  }
 
   if (!profile) {
     throw new ApiError(404, 'Profile not found. Please complete your profile.');

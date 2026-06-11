@@ -55,4 +55,6 @@ const quizSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
+quizSchema.index({ language: 1, topic: 1 });
+
 export default mongoose.model('Quiz', quizSchema);
