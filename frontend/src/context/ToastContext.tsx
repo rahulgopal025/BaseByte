@@ -1,8 +1,13 @@
 import React, { createContext, useContext } from "react";
 import { useToast } from "../hooks/useToast";
 import Toast from "../components/ui/Toast";
+import type { ToastType } from "../types/common.types";
 
-const ToastContext = createContext<any>(null);
+interface ToastContextType {
+  showToast: (message: string, type: ToastType) => void;
+}
+
+const ToastContext = createContext<ToastContextType | null>(null);
 
 export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
   const { toasts, showToast, removeToast } = useToast();
@@ -20,4 +25,8 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export const useToastContext = () => useContext(ToastContext);
+export const useToastContext = (): ToastContextType => {
+  const context = useContext(ToastContext);
+  if (!context) throw new Error("useToastContext must be used within ToastProvider");
+  return context;
+};

@@ -40,35 +40,48 @@ export default function Auth() {
         response = await signupApi(name, email, password);
       }
 
-      if (response.data.success || response.data.status === "success") {
+      if (response.data.success) {
         if (isLogin) {
-          const userData = response.data.data?.user || response.data.user;
-          showToast(`Welcome back, ${userData?.name?.split(' ')[0] || 'User'}!`, 'success');
-          login(response.data.data || response.data);
-          
-          if (userData?.role === 'admin') {
-            navigate("/admin");
+          // Get the data directly — no || fallback guessing
+          const apiData = response.data.data;
+          const userData = apiData.user;
+
+          // Login first — store token and user in context
+          login(apiData);
+
+          showToast(
+            `Welcome back, ${userData?.name?.split(" ")[0] || "User"}!`,
+            "success"
+          );
+
+          // Navigate based on role from API response directly
+          if (userData?.role === "admin") {
+            navigate("/admin", { replace: true });
           } else {
-            navigate("/");
+            navigate("/", { replace: true });
           }
+
         } else {
-          showToast("Account created successfully! Please login.", 'success');
-          setIsLogin(true); // Switch to login after signup
+          showToast("Account created successfully! Please login.", "success");
+          setIsLogin(true);
           setError("");
         }
+
       } else {
-        showToast(response.data.message || "Something went wrong!", 'error');
-        setError(response.data.message || "Something went wrong!");
+        const msg = response.data.message || "Something went wrong!";
+        showToast(msg, "error");
+        setError(msg);
       }
+
     } catch (error: any) {
-      const errMsg = error?.response?.data?.message || "Server error! Please try again.";
-      showToast(errMsg, 'error');
+      const errMsg =
+        error?.response?.data?.message || "Server error! Please try again.";
+      showToast(errMsg, "error");
       setError(errMsg);
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#050505] px-4 py-12 relative overflow-hidden">
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/10 blur-[120px] rounded-full" />

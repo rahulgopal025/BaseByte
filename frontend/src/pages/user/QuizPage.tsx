@@ -3,12 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import { ChevronLeft, CheckCircle2, XCircle, ArrowRight, ArrowLeft } from 'lucide-react';
 import { getQuizByTopic } from '../../api/quiz.api';
+import type { Quiz } from "../../types/quiz.types";
 
 const QuizPage = () => {
   const { lang, topic } = useParams(); 
   const navigate = useNavigate();
   
-  const [questions, setQuestions] = useState<any[]>([]);
+  const [questions, setQuestions] = useState<Quiz[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState<Record<number, number>>({});
   const [showScore, setShowScore] = useState(false);
@@ -20,7 +21,7 @@ const QuizPage = () => {
         setQuestions(res.data.data || res.data);
         setLoading(false);
       } catch (err) {
-        console.error("Error fetching quizzes");
+        console.error("Failed to fetch quizzes:", err);
         setLoading(false);
       }
     };
@@ -172,7 +173,7 @@ const QuizPage = () => {
         </div>
 
         
-        <div className="py-4 flex gap-3 mb-25">
+        <div className="py-4 flex gap-3 mb-24">
           
           <button 
             onClick={handlePrev}

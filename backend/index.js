@@ -6,6 +6,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import axios from 'axios';
+import compression from 'compression';
 
 import connectDB from './config/db.js';
 import errorHandler from './middleware/errorHandler.middleware.js';
@@ -29,6 +30,7 @@ const app = express();
 
 // Security & Middlewares
 app.use(helmet());
+app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
@@ -52,7 +54,13 @@ app.use(cors({
 
 // Health Check
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', message: 'BaseByte server is running.' });
+  res.json({
+    status: 'ok',
+    message: 'BaseByte server is running.',
+    uptime: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
 });
 
 // Rate Limiter
@@ -112,5 +120,7 @@ const PORT = process.env.PORT || 5000;
 connectDB().then(() => {
   app.listen(PORT, () => {
     console.log(`🚀 BaseByte server running on port ${PORT}`);
+    console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🔗 Frontend: ${process.env.FRONTEND_URL}`);
   });
 });

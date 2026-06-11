@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getProblemById } from "../../api/problem.api";
+import type { Problem } from "../../types/problem.types";
 import { ChevronLeft, Info, Terminal, Play, RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
 import LanguageSelector from "../../components/Compiler/LanguageSelector";
 import CodeEditor from "../../components/Compiler/CodeEditor";
@@ -17,7 +18,7 @@ const codeTemplates: { [key: string]: string } = {
 export default function ProblemSolve() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [problem, setProblem] = useState<any>(null);
+  const [problem, setProblem] = useState<Problem | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Compiler state
@@ -41,7 +42,7 @@ export default function ProblemSolve() {
            setCode(codeTemplates[lang] || "");
         }
       } catch (err) {
-        console.error("Error");
+        console.error("Failed to fetch problem:", err);
       } finally {
         setLoading(false);
       }

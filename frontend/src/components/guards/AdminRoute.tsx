@@ -3,7 +3,16 @@ import { useAuth } from "../../hooks/useAuth";
 
 export default function AdminRoute() {
   const { isAuthenticated, isAdmin } = useAuth();
-  if (!isAuthenticated) return <Navigate to="/auth" replace />;
-  if (!isAdmin) return <Navigate to="/" replace />;
+
+  // Fallback: read from localStorage directly in case
+  // React state hasn't updated yet after login redirect
+  const storedUser = localStorage.getItem("user");
+  const storedRole = storedUser ? JSON.parse(storedUser)?.role : null;
+
+  const hasAccess = isAdmin || storedRole === "admin";
+  const hasAuth = isAuthenticated || !!localStorage.getItem("accessToken");
+
+  if (!hasAuth) return <Navigate to="/auth" replace />;
+  if (!hasAccess) return <Navigate to="/" replace />;
   return <Outlet />;
 }

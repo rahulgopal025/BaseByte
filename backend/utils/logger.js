@@ -1,17 +1,22 @@
 const logger = {
-  info: (...args) => {
+  info: (message, ...args) => {
     if (process.env.NODE_ENV !== 'test') {
-      console.log(`[INFO] ${new Date().toISOString()}`, ...args);
+      console.log(`[INFO] [${new Date().toISOString()}] ${message}`, ...args);
     }
   },
-  error: (...args) => {
-    console.error(`[ERROR] ${new Date().toISOString()}`, ...args);
+  error: (message, ...args) => {
+    console.error(`[ERROR] [${new Date().toISOString()}] ${message}`, ...args);
   },
-  warn: (...args) => {
+  warn: (message, ...args) => {
     if (process.env.NODE_ENV !== 'test') {
-      console.warn(`[WARN] ${new Date().toISOString()}`, ...args);
+      console.warn(`[WARN] [${new Date().toISOString()}] ${message}`, ...args);
     }
   },
+  success: (message, ...args) => {
+    if (process.env.NODE_ENV !== 'test') {
+      console.log(`[SUCCESS] [${new Date().toISOString()}] ${message}`, ...args);
+    }
+  }
 };
 
 export default logger;

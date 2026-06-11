@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ChevronRight, Terminal, Clock, Award, Play } from "lucide-react";
 import { getProblemById } from "../../api/problem.api";
+import type { Problem } from "../../types/problem.types";
+
 export default function ProblemDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [problem, setProblem] = useState<any>(null);
+  const [problem, setProblem] = useState<Problem | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -14,7 +16,7 @@ export default function ProblemDetails() {
         const res = await getProblemById(id!);
         setProblem(res.data.data || res.data);
       } catch (err) {
-        console.error("Error");
+        console.error("Failed to fetch problem:", err);
       } finally {
         setLoading(false);
       }

@@ -130,7 +130,7 @@ export default function Practice() {
             </div>
           ) : filteredProblems.length > 0 ? (
             <div className="grid grid-cols-1 gap-4">
-              {filteredProblems.map((problem: any) => (
+              {filteredProblems.map((problem) => (
                 <ProblemCard key={problem._id} problem={problem} />
               ))}
             </div>

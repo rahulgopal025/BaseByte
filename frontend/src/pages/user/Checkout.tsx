@@ -1,5 +1,7 @@
-import { BookOpen, Lock, Zap } from "lucide-react";
+import { BookOpen, Zap } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 export default function Checkout() {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-[#050505] flex items-center justify-center text-white p-8">
       <div className="text-center max-w-lg">
@@ -11,11 +13,11 @@ export default function Checkout() {
         </div>
         <h1 className="text-5xl font-black mb-4 tracking-tight">Checkout</h1>
         <p className="text-zinc-400 text-lg leading-relaxed mb-8">
-          Payment processing and course enrollment will be available here.
+          Secure payment integration with Razorpay coming in Phase 2.
         </p>
-        <div className="flex items-center justify-center gap-3 text-zinc-600 text-sm font-bold">
-          <Lock size={14} /> Available in Phase 2
-        </div>
+        <button onClick={() => navigate('/courses')} className="px-8 py-3 bg-indigo-600 text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-indigo-500 transition-all active:scale-95">
+          Back to Courses
+        </button>
       </div>
     </div>
   );
