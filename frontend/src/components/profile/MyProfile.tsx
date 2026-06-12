@@ -1,11 +1,21 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useProfile } from "../../context/ProfileContext";
 import { useAuth } from "../../context/AuthContext";
 import { Edit3, MapPin, School, Phone, Mail, User, PlusCircle, ShieldCheck } from "lucide-react";
+import { getMyEnrollments } from "../../api/course.api";
+import { useNavigate } from "react-router-dom";
 
 export default function MyProfile({ setView }: { setView: any }) {
   const { profileData } = useProfile();
   const { user } = useAuth();
+  const [enrollments, setEnrollments] = useState<any[]>([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    getMyEnrollments()
+      .then(res => setEnrollments(res.data.data || []))
+      .catch(console.error);
+  }, []);
 
   return (
     <div className="max-w-4xl mx-auto space-y-10 animate-in fade-in zoom-in pt-1 duration-500 -mt-24 ">
@@ -116,6 +126,28 @@ export default function MyProfile({ setView }: { setView: any }) {
           <button onClick={() => setView("form")} className="px-10 py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-indigo-500 transition-all">
              Start Setup Now
           </button>
+        </div>
+      )}
+
+      {enrollments.length > 0 && (
+        <div className="mt-8 bg-[#0d0d0e] border border-white/5 rounded-[24px] p-6">
+          <h3 className="text-lg font-black mb-4">My Enrolled Courses</h3>
+          <div className="space-y-3">
+            {enrollments.map((enr: any) => (
+              <div key={enr._id} className="flex items-center justify-between p-4 bg-white/[0.02] rounded-2xl">
+                <div>
+                  <p className="font-bold text-sm">{enr.courseId?.title || "Course"}</p>
+                  <p className="text-zinc-500 text-xs">{enr.courseId?.instructor}</p>
+                </div>
+                <button
+                  onClick={() => navigate(`/courses/${enr.courseId?._id}/learn`)}
+                  className="px-4 py-2 bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all"
+                >
+                  Continue →
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

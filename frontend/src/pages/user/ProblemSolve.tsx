@@ -8,6 +8,7 @@ import CodeEditor from "../../components/Compiler/CodeEditor";
 import Console from "../../components/Compiler/Console";
 import axiosInstance from "../../api/axios.instance";
 import { API_ENDPOINTS } from "../../constants/api.constants";
+import { useToastContext } from "../../context/ToastContext";
 
 const codeTemplates: { [key: string]: string } = {
   c: '#include <stdio.h>\n\nint main() {\n    printf("welcome to BaseByte C!");\n    return 0;\n}',
@@ -20,6 +21,7 @@ export default function ProblemSolve() {
   const navigate = useNavigate();
   const [problem, setProblem] = useState<Problem | null>(null);
   const [loading, setLoading] = useState(true);
+  const { showToast } = useToastContext();
 
   // Compiler state
   const [language, setLanguage] = useState("c");
@@ -82,6 +84,25 @@ export default function ProblemSolve() {
       setStatus("error");
       setOutput("Connection Error! Is the backend server running?---Check backend connection.---X");
       setHint("Check backend connection.");
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!output || output === "Compiling your code... ⚙️") {
+      showToast("Please run your code first before submitting.", "error");
+      return;
+    }
+    try {
+      await axiosInstance.post("/api/submissions", {
+        problemId: id,
+        code,
+        language,
+        status: status === "success" ? "Accepted" : "Wrong Answer",
+        testResults: []
+      });
+      showToast("Solution submitted successfully!", "success");
+    } catch {
+      showToast("Failed to submit. Please try again.", "error");
     }
   };
 
@@ -175,6 +196,12 @@ export default function ProblemSolve() {
                   className="bg-indigo-600 hover:bg-indigo-700 px-5 py-2 rounded-xl font-bold text-xs flex items-center gap-2 shadow-lg active:scale-95 transition-all text-white"
                 >
                   <Play size={12} fill="currentColor" /> {status === "loading" ? "..." : "RUN"}
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-xl font-black uppercase text-xs tracking-widest transition-all active:scale-95 flex items-center gap-2"
+                >
+                  Submit
                 </button>
               </div>
             </div>

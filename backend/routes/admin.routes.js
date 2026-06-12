@@ -19,14 +19,6 @@ router.use(verifyToken, verifyAdmin);
 
 // ─── DASHBOARD STATS ─────────────────────────────────────────────
 router.get('/stats', asyncHandler(async (req, res) => {
-  const totalUsers = await User.countDocuments();
-  const totalStudentsOnly = await User.countDocuments({ role: "student" });
-  const totalAdmins = await User.countDocuments({ role: "admin" });
-
-  console.log("TOTAL USERS:", totalUsers);
-  console.log("TOTAL STUDENTS:", totalStudentsOnly);
-  console.log("TOTAL ADMINS:", totalAdmins);
-
   const [
     totalStudents,
     totalCourses,
