@@ -39,6 +39,7 @@ import AdminLectures from "./pages/admin/AdminLectures";
 import AdminStudents from "./pages/admin/AdminStudents";
 import AdminEnrollments from "./pages/admin/AdminEnrollments";
 import AdminProblems from "./pages/admin/AdminProblems";
+import AdminQuiz from "./pages/admin/AdminQuiz";
 import AdminFeedback from "./pages/admin/AdminFeedback";
 import AdminNotes from "./pages/admin/AdminNotes";
 
@@ -52,21 +53,17 @@ export default function App() {
 
               {/* USER ROUTES — with Navbar and Footer */}
               <Route element={<UserLayout />}>
-
-                {/* Public */}
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/compiler" element={<Compiler />} />
                 <Route path="/courses" element={<Courses />} />
 
-                {/* Guest only — redirect to / if already logged in */}
                 <Route element={<GuestRoute />}>
                   <Route path="/auth" element={<Auth />} />
                 </Route>
                 <Route path="/login" element={<Navigate to="/auth" replace />} />
                 <Route path="/signup" element={<Navigate to="/auth" replace />} />
 
-                {/* Protected — redirect to /auth if not logged in */}
                 <Route element={<ProtectedRoute />}>
                   <Route path="/practice" element={<Practice />} />
                   <Route path="/practice/:id" element={<ProblemDetails />} />
@@ -81,11 +78,10 @@ export default function App() {
                   <Route path="/feedback" element={<Feedback />} />
                 </Route>
 
-                {/* 404 */}
                 <Route path="*" element={<NotFound />} />
               </Route>
 
-              {/* ADMIN ROUTES — with AdminLayout, no Navbar/Footer */}
+              {/* ADMIN ROUTES — OUTSIDE UserLayout, no Navbar/Footer */}
               <Route element={<AdminRoute />}>
                 <Route element={<AdminLayout />}>
                   <Route path="/admin" element={<AdminDashboard />} />
@@ -94,6 +90,7 @@ export default function App() {
                   <Route path="/admin/students" element={<AdminStudents />} />
                   <Route path="/admin/enrollments" element={<AdminEnrollments />} />
                   <Route path="/admin/problems" element={<AdminProblems />} />
+                  <Route path="/admin/quiz" element={<AdminQuiz />} />
                   <Route path="/admin/feedback" element={<AdminFeedback />} />
                   <Route path="/admin/notes" element={<AdminNotes />} />
                 </Route>

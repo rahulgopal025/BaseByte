@@ -56,7 +56,7 @@ export default function Auth() {
 
           // Navigate based on role from API response directly
           if (userData?.role === "admin") {
-            navigate("/admin", { replace: true });
+            setTimeout(() => navigate("/admin", { replace: true }), 100);
           } else {
             navigate("/", { replace: true });
           }

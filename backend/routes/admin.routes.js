@@ -1,45 +1,240 @@
 import express from 'express';
 import Enrollment from '../models/Enrollment.js';
 import Lecture from '../models/Lecture.js';
+import Course from '../models/Course.js';
 import User from '../models/User.js';
+import Problem from '../models/Problem.js';
+import Quiz from '../models/Quiz.js';
+import Notes from '../models/Notes.js';
+import Feedback from '../models/Feedback.js';
 import { verifyToken } from '../middleware/auth.middleware.js';
 import { verifyAdmin } from '../middleware/admin.middleware.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import ApiResponse from '../utils/ApiResponse.js';
+import ApiError from '../utils/ApiError.js';
 
 const router = express.Router();
-
-// All admin routes require auth + admin
 router.use(verifyToken, verifyAdmin);
 
-// Enrollment management
+
+// ─── DASHBOARD STATS ─────────────────────────────────────────────
+router.get('/stats', asyncHandler(async (req, res) => {
+  const totalUsers = await User.countDocuments();
+  const totalStudentsOnly = await User.countDocuments({ role: "student" });
+  const totalAdmins = await User.countDocuments({ role: "admin" });
+
+  console.log("TOTAL USERS:", totalUsers);
+  console.log("TOTAL STUDENTS:", totalStudentsOnly);
+  console.log("TOTAL ADMINS:", totalAdmins);
+
+  const [
+    totalStudents,
+    totalCourses,
+    totalProblems,
+    totalQuizzes,
+    totalFeedback,
+    totalNotes,
+    pendingEnrollments,
+    recentStudents
+  ] = await Promise.all([
+    User.countDocuments(),
+    Course.countDocuments(),
+    Problem.countDocuments(),
+    Quiz.countDocuments(),
+    Feedback.countDocuments(),
+    Notes.countDocuments({ isApproved: true }),
+    Enrollment.countDocuments({ status: 'pending' }),
+    User.find({ role: 'student' })
+      .select('name email createdAt')
+      .sort({ createdAt: -1 })
+      .limit(5)
+  ]);
+
+  res.json(new ApiResponse(200, {
+    totalStudents,
+    totalCourses,
+    totalProblems,
+    totalQuizzes,
+    totalFeedback,
+    totalNotes,
+    pendingEnrollments,
+    recentStudents
+  }, 'Stats fetched.'));
+}));
+
+// ─── STUDENT MANAGEMENT ──────────────────────────────────────────
+router.get('/students', asyncHandler(async (req, res) => {
+  const students = await User.find({ role: 'student' })
+    .select('-password')
+    .sort({ createdAt: -1 });
+  res.json(new ApiResponse(200, students, 'Students fetched.'));
+}));
+
+router.delete('/students/:id', asyncHandler(async (req, res) => {
+  await User.findByIdAndDelete(req.params.id);
+  res.json(new ApiResponse(200, null, 'Student deleted.'));
+}));
+
+// ─── ENROLLMENT MANAGEMENT ───────────────────────────────────────
+router.get('/enrollments', asyncHandler(async (req, res) => {
+  const enrollments = await Enrollment.find()
+    .populate('userId', 'name email')
+    .populate('courseId', 'title price')
+    .sort({ enrolledAt: -1 });
+  res.json(new ApiResponse(200, enrollments, 'Enrollments fetched.'));
+}));
+
 router.get('/enrollments/pending', asyncHandler(async (req, res) => {
-  const pending = await Enrollment.find({ status: 'pending' }).sort({ enrolledAt: -1 });
+  const pending = await Enrollment.find({ status: 'pending' })
+    .populate('userId', 'name email')
+    .populate('courseId', 'title price')
+    .sort({ enrolledAt: -1 });
   res.json(new ApiResponse(200, pending, 'Pending enrollments fetched.'));
 }));
 
 router.put('/enrollments/status', asyncHandler(async (req, res) => {
-  const { requestId, status } = req.body;
-  const updated = await Enrollment.findByIdAndUpdate(requestId, { status }, { new: true });
-  res.json(new ApiResponse(200, updated, 'Enrollment status updated.'));
+  const { enrollmentId, status } = req.body;
+  if (!['approved', 'rejected'].includes(status)) {
+    throw new ApiError(400, 'Invalid status. Use approved or rejected.');
+  }
+  const updated = await Enrollment.findByIdAndUpdate(
+    enrollmentId,
+    { status },
+    { new: true }
+  );
+  if (!updated) throw new ApiError(404, 'Enrollment not found.');
+  res.json(new ApiResponse(200, updated, `Enrollment ${status}.`));
 }));
 
-// Lecture management
-router.post('/lectures/add', asyncHandler(async (req, res) => {
-  const newLecture = new Lecture(req.body);
-  await newLecture.save();
-  res.status(201).json(new ApiResponse(201, newLecture, 'Lecture added.'));
+// ─── COURSE MANAGEMENT ───────────────────────────────────────────
+router.get('/courses', asyncHandler(async (req, res) => {
+  const courses = await Course.find().sort({ createdAt: -1 });
+  res.json(new ApiResponse(200, courses, 'Courses fetched.'));
 }));
 
-router.get('/lectures/all', asyncHandler(async (req, res) => {
-  const lectures = await Lecture.find().sort({ order: 1 });
+router.post('/courses', asyncHandler(async (req, res) => {
+  const course = await Course.create(req.body);
+  res.status(201).json(new ApiResponse(201, course, 'Course created.'));
+}));
+
+router.put('/courses/:id', asyncHandler(async (req, res) => {
+  const course = await Course.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  if (!course) throw new ApiError(404, 'Course not found.');
+  res.json(new ApiResponse(200, course, 'Course updated.'));
+}));
+
+router.delete('/courses/:id', asyncHandler(async (req, res) => {
+  await Course.findByIdAndDelete(req.params.id);
+  res.json(new ApiResponse(200, null, 'Course deleted.'));
+}));
+
+// ─── LECTURE MANAGEMENT ──────────────────────────────────────────
+router.get('/lectures', asyncHandler(async (req, res) => {
+  const lectures = await Lecture.find()
+    .populate('courseId', 'title')
+    .sort({ order: 1 });
   res.json(new ApiResponse(200, lectures, 'Lectures fetched.'));
 }));
 
-// Student management
-router.get('/students', asyncHandler(async (req, res) => {
-  const students = await User.find({ role: 'student' }).select('-password');
-  res.json(new ApiResponse(200, students, 'Students fetched.'));
+router.post('/lectures', asyncHandler(async (req, res) => {
+  const lecture = await Lecture.create(req.body);
+  res.status(201).json(new ApiResponse(201, lecture, 'Lecture added.'));
+}));
+
+router.put('/lectures/:id', asyncHandler(async (req, res) => {
+  const lecture = await Lecture.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  if (!lecture) throw new ApiError(404, 'Lecture not found.');
+  res.json(new ApiResponse(200, lecture, 'Lecture updated.'));
+}));
+
+router.delete('/lectures/:id', asyncHandler(async (req, res) => {
+  await Lecture.findByIdAndDelete(req.params.id);
+  res.json(new ApiResponse(200, null, 'Lecture deleted.'));
+}));
+
+// ─── PROBLEM MANAGEMENT ──────────────────────────────────────────
+router.get('/problems', asyncHandler(async (req, res) => {
+  const problems = await Problem.find().sort({ createdAt: -1 });
+  res.json(new ApiResponse(200, problems, 'Problems fetched.'));
+}));
+
+router.post('/problems', asyncHandler(async (req, res) => {
+  const problem = await Problem.create(req.body);
+  res.status(201).json(new ApiResponse(201, problem, 'Problem created.'));
+}));
+
+router.put('/problems/:id', asyncHandler(async (req, res) => {
+  const problem = await Problem.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  if (!problem) throw new ApiError(404, 'Problem not found.');
+  res.json(new ApiResponse(200, problem, 'Problem updated.'));
+}));
+
+router.delete('/problems/:id', asyncHandler(async (req, res) => {
+  await Problem.findByIdAndDelete(req.params.id);
+  res.json(new ApiResponse(200, null, 'Problem deleted.'));
+}));
+
+// ─── BULK QUIZ UPLOAD ─────────────────────────────────────────────
+router.post('/quiz/bulk', asyncHandler(async (req, res) => {
+  const { questions } = req.body;
+  if (!Array.isArray(questions) || questions.length === 0) {
+    throw new ApiError(400, 'questions must be a non-empty array.');
+  }
+  const inserted = await Quiz.insertMany(questions);
+  res.status(201).json(new ApiResponse(201, {
+    count: inserted.length
+  }, `${inserted.length} quiz questions uploaded successfully.`));
+}));
+
+router.delete('/quiz/:id', asyncHandler(async (req, res) => {
+  await Quiz.findByIdAndDelete(req.params.id);
+  res.json(new ApiResponse(200, null, 'Quiz question deleted.'));
+}));
+
+// ─── NOTES MANAGEMENT ────────────────────────────────────────────
+router.get('/notes', asyncHandler(async (req, res) => {
+  const notes = await Notes.find()
+    .populate('uploadedBy', 'name email')
+    .sort({ createdAt: -1 });
+  res.json(new ApiResponse(200, notes, 'Notes fetched.'));
+}));
+
+router.post('/notes', asyncHandler(async (req, res) => {
+  const note = await Notes.create({
+    ...req.body,
+    uploadedBy: req.user.id,
+    uploaderEmail: req.user.email,
+    isApproved: true
+  });
+  res.status(201).json(new ApiResponse(201, note, 'Notes uploaded.'));
+}));
+
+router.put('/notes/approve/:id', asyncHandler(async (req, res) => {
+  const note = await Notes.findByIdAndUpdate(
+    req.params.id,
+    { isApproved: true },
+    { new: true }
+  );
+  if (!note) throw new ApiError(404, 'Notes not found.');
+  res.json(new ApiResponse(200, note, 'Notes approved.'));
+}));
+
+router.delete('/notes/:id', asyncHandler(async (req, res) => {
+  await Notes.findByIdAndDelete(req.params.id);
+  res.json(new ApiResponse(200, null, 'Notes deleted.'));
+}));
+
+// ─── FEEDBACK MANAGEMENT ─────────────────────────────────────────
+router.get('/feedback', asyncHandler(async (req, res) => {
+  const feedbacks = await Feedback.find()
+    .populate('userId', 'name email')
+    .sort({ createdAt: -1 });
+  res.json(new ApiResponse(200, feedbacks, 'Feedback fetched.'));
+}));
+
+router.delete('/feedback/:id', asyncHandler(async (req, res) => {
+  await Feedback.findByIdAndDelete(req.params.id);
+  res.json(new ApiResponse(200, null, 'Feedback deleted.'));
 }));
 
 export default router;
