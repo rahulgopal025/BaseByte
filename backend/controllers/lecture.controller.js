@@ -24,13 +24,17 @@ export const getLecturesByCourse = asyncHandler(async (req, res) => {
 });
 
 export const addLecture = asyncHandler(async (req, res) => {
-  res.status(201).json(new ApiResponse(201, null, 'Add lecture coming soon.'));
+  const lecture = await Lecture.create(req.body);
+  res.status(201).json(new ApiResponse(201, lecture, 'Lecture added.'));
 });
 
 export const updateLecture = asyncHandler(async (req, res) => {
-  res.json(new ApiResponse(200, null, 'Update lecture coming soon.'));
+  const lecture = await Lecture.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  if (!lecture) throw new ApiError(404, 'Lecture not found.');
+  res.json(new ApiResponse(200, lecture, 'Lecture updated.'));
 });
 
 export const deleteLecture = asyncHandler(async (req, res) => {
-  res.json(new ApiResponse(200, null, 'Delete lecture coming soon.'));
+  await Lecture.findByIdAndDelete(req.params.id);
+  res.json(new ApiResponse(200, null, 'Lecture deleted.'));
 });

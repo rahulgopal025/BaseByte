@@ -7,7 +7,7 @@ import { verifyAdmin } from '../middleware/admin.middleware.js';
 const router = express.Router();
 
 router.post('/upload', verifyToken, uploadNotes);
-router.get('/', verifyToken, getAllNotes);
+router.get('/', getAllNotes);
 router.put('/approve/:id', verifyToken, verifyAdmin, approveNotes);
 
 export default router;

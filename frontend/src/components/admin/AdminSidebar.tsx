@@ -40,7 +40,7 @@ const navItems = [
   }
 ];
 
-export default function AdminSidebar() {
+export default function AdminSidebar({ onMobileClose }: { onMobileClose?: () => void }) {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -61,15 +61,22 @@ export default function AdminSidebar() {
       className={`${collapsed ? "w-[72px]" : "w-64"} min-h-screen bg-[#08080A] border-r border-white/5 flex flex-col transition-all duration-300 relative flex-shrink-0`}
     >
       {/* Logo */}
-      <div className={`flex items-center gap-3 p-5 border-b border-white/5 ${collapsed ? "justify-center" : ""}`}>
-        <div className="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0">
-          <Code size={18} className="text-white" />
-        </div>
-        {!collapsed && (
-          <div>
-            <h1 className="text-white font-black text-base leading-tight">BaseByte</h1>
-            <p className="text-indigo-400 text-[9px] font-black uppercase tracking-widest">Admin Panel</p>
+      <div className={`flex items-center justify-between gap-3 p-5 border-b border-white/5 ${collapsed ? "justify-center" : ""}`}>
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0">
+            <Code size={18} className="text-white" />
           </div>
+          {!collapsed && (
+            <div>
+              <h1 className="text-white font-black text-base leading-tight">BaseByte</h1>
+              <p className="text-indigo-400 text-[9px] font-black uppercase tracking-widest">Admin Panel</p>
+            </div>
+          )}
+        </div>
+        {onMobileClose && (
+          <button onClick={onMobileClose} className="md:hidden text-zinc-500 hover:text-white p-1">
+            <ChevronLeft size={16} />
+          </button>
         )}
       </div>
 

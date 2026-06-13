@@ -123,9 +123,6 @@ export default function Courses() {
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-1 text-yellow-400 text-xs font-bold">
-                      <Star size={12} fill="currentColor" /> 4.5
-                    </div>
                   </div>
                 </div>
               </div>

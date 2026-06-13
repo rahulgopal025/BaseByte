@@ -32,6 +32,7 @@ export default function ProblemSolve() {
   const [errorLine, setErrorLine] = useState<number | null>(null);
   const [input, setInput] = useState(""); 
   const [hint, setHint] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchProblem = async () => {
@@ -92,6 +93,7 @@ export default function ProblemSolve() {
       showToast("Please run your code first before submitting.", "error");
       return;
     }
+    setSubmitting(true);
     try {
       await axiosInstance.post("/api/submissions", {
         problemId: id,
@@ -103,6 +105,8 @@ export default function ProblemSolve() {
       showToast("Solution submitted successfully!", "success");
     } catch {
       showToast("Failed to submit. Please try again.", "error");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -199,9 +203,10 @@ export default function ProblemSolve() {
                 </button>
                 <button
                   onClick={handleSubmit}
-                  className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-xl font-black uppercase text-xs tracking-widest transition-all active:scale-95 flex items-center gap-2"
+                  disabled={submitting}
+                  className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-xl font-black uppercase text-xs tracking-widest transition-all active:scale-95 flex items-center gap-2 disabled:opacity-60"
                 >
-                  Submit
+                  {submitting ? "Submitting..." : "Submit"}
                 </button>
               </div>
             </div>

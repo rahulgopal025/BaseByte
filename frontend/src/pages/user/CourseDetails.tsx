@@ -101,18 +101,7 @@ export default function CourseDetails() {
               )}
             </div>
 
-            {/* What you'll learn */}
-            <div className="bg-[#0d0d0e] border border-white/5 rounded-[24px] p-6 mb-6">
-              <h2 className="text-xl font-black mb-4">What you'll learn</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {["Fundamentals and core concepts", "Hands-on coding problems", "Real-world applications", "Quiz assessments"].map(item => (
-                  <div key={item} className="flex items-center gap-3 text-zinc-300 text-sm">
-                    <CheckCircle2 size={16} className="text-green-400 flex-shrink-0" />
-                    {item}
-                  </div>
-                ))}
-              </div>
-            </div>
+
           </div>
 
           {/* Right — Enroll Card */}

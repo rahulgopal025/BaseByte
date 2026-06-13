@@ -1,5 +1,6 @@
 import Enrollment from '../models/Enrollment.js';
 import Course from '../models/Course.js';
+import User from '../models/User.js';
 import ApiResponse from '../utils/ApiResponse.js';
 import ApiError from '../utils/ApiError.js';
 import asyncHandler from '../utils/asyncHandler.js';
@@ -18,7 +19,6 @@ export const requestEnrollment = asyncHandler(async (req, res) => {
 
   const enrollment = await Enrollment.create({
     userId: req.user.id,
-    userEmail: req.user.email,
     courseId,
     status
   });

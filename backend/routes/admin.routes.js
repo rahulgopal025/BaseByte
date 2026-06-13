@@ -29,7 +29,7 @@ router.get('/stats', asyncHandler(async (req, res) => {
     pendingEnrollments,
     recentStudents
   ] = await Promise.all([
-    User.countDocuments(),
+    User.countDocuments({ role: 'student' }),
     Course.countDocuments(),
     Problem.countDocuments(),
     Quiz.countDocuments(),
