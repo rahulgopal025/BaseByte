@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import { Code2, Plus, Trash2, Edit, X } from "lucide-react";
 import { getAdminProblems, createProblem, updateProblem, deleteProblem } from "../../api/admin.api";
+import { getAllCourses } from "../../api/course.api";
 
 const emptyForm = {
   title: "", description: "", difficulty: "Easy",
-  language: "c", tags: "", sampleInput: "", sampleOutput: ""
+  language: "c", tags: "", sampleInput: "", sampleOutput: "",
+  course: "", topic: "", leetCodeUrl: "", gfgUrl: "", hackerRankUrl: "", codeChefUrl: ""
 };
 
 export default function AdminProblems() {
   const [problems, setProblems] = useState<any[]>([]);
+  const [courses, setCourses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
@@ -16,8 +19,11 @@ export default function AdminProblems() {
   const [saving, setSaving] = useState(false);
 
   const load = () => {
-    getAdminProblems()
-      .then((res) => setProblems(res.data.data || []))
+    Promise.all([getAdminProblems(), getAllCourses()])
+      .then(([probRes, courseRes]) => {
+        setProblems(probRes.data.data || []);
+        setCourses(courseRes.data.data || []);
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
   };
@@ -28,7 +34,8 @@ export default function AdminProblems() {
     e.preventDefault();
     setSaving(true);
     try {
-      const payload = { ...form, tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean) };
+      const payload: any = { ...form, tags: form.tags.split(",").map((t: string) => t.trim()).filter(Boolean) };
+      if (payload.course === "") delete payload.course;
       if (editId) { await updateProblem(editId, payload); }
       else { await createProblem(payload); }
       setShowForm(false); setEditId(null); setForm(emptyForm); load();
@@ -37,7 +44,16 @@ export default function AdminProblems() {
   };
 
   const handleEdit = (p: any) => {
-    setForm({ ...p, tags: p.tags?.join(", ") || "" });
+    setForm({ 
+      ...p, 
+      tags: p.tags?.join(", ") || "", 
+      course: p.course?._id || p.course || "",
+      topic: p.topic || "",
+      leetCodeUrl: p.leetCodeUrl || "",
+      gfgUrl: p.gfgUrl || "",
+      hackerRankUrl: p.hackerRankUrl || "",
+      codeChefUrl: p.codeChefUrl || ""
+    });
     setEditId(p._id); setShowForm(true);
   };
 
@@ -84,7 +100,14 @@ export default function AdminProblems() {
             </div>
             <form onSubmit={handleSubmit} className="space-y-4">
               <input required placeholder="Problem Title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className={inputClass} />
-              <textarea required placeholder="Problem Description" rows={4} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className={inputClass + " resize-none"} />
+              <textarea required placeholder="Problem Description" rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className={inputClass + " resize-none"} />
+              <div className="grid grid-cols-2 gap-4">
+                <select value={form.course} onChange={(e) => setForm({ ...form, course: e.target.value })} className={selectClass}>
+                  <option value="" className="bg-[#0d0d0e] text-white">Select Course (Optional)</option>
+                  {courses.map(c => <option key={c._id} value={c._id} className="bg-[#0d0d0e] text-white">{c.title}</option>)}
+                </select>
+                <input placeholder="Topic (e.g. Arrays)" value={form.topic} onChange={(e) => setForm({ ...form, topic: e.target.value })} className={inputClass} />
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <select value={form.difficulty} onChange={(e) => setForm({ ...form, difficulty: e.target.value })} className={selectClass}>
                   <option value="Easy" className="bg-[#0d0d0e] text-white">Easy</option>
@@ -97,7 +120,13 @@ export default function AdminProblems() {
                   <option value="java" className="bg-[#0d0d0e] text-white">Java</option>
                 </select>
               </div>
-              <input placeholder="Tags (comma separated)" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} className={inputClass} />
+              <div className="grid grid-cols-2 gap-4">
+                <input placeholder="Tags (comma separated)" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} className={inputClass} />
+                <input placeholder="LeetCode URL" value={form.leetCodeUrl} onChange={(e) => setForm({ ...form, leetCodeUrl: e.target.value })} className={inputClass} />
+                <input placeholder="GeeksforGeeks URL" value={form.gfgUrl} onChange={(e) => setForm({ ...form, gfgUrl: e.target.value })} className={inputClass} />
+                <input placeholder="HackerRank URL" value={form.hackerRankUrl} onChange={(e) => setForm({ ...form, hackerRankUrl: e.target.value })} className={inputClass} />
+                <input placeholder="CodeChef URL" value={form.codeChefUrl} onChange={(e) => setForm({ ...form, codeChefUrl: e.target.value })} className={inputClass} />
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <textarea placeholder="Sample Input" rows={3} value={form.sampleInput} onChange={(e) => setForm({ ...form, sampleInput: e.target.value })} className={inputClass + " resize-none font-mono text-xs"} />
                 <textarea required placeholder="Sample Output" rows={3} value={form.sampleOutput} onChange={(e) => setForm({ ...form, sampleOutput: e.target.value })} className={inputClass + " resize-none font-mono text-xs"} />

@@ -26,6 +26,7 @@ import notesRoutes from './routes/notes.routes.js';
 import feedbackRoutes from './routes/feedback.routes.js';
 import submissionRoutes from './routes/submission.routes.js';
 
+
 const app = express();
 
 // Security & Middlewares
@@ -66,53 +67,7 @@ app.get('/health', (req, res) => {
 // Rate Limiter
 app.use(globalLimiter);
 
-// Compiler Route
-const getHinglishHint = (stderr) => {
-  if (!stderr) return null;
-  const err = stderr.toLowerCase();
-  const lineMatch = stderr.match(/:(?:\s+)?(\d+)(?::\d+)?/);
-  const lineNo = lineMatch ? `Line ${lineMatch[1]}` : 'Somewhere in code';
-  if (err.includes("expected ';'")) return `Bhai, ${lineNo} pe semicolon (;) lagana bhul gaya kya? 😅`;
-  if (err.includes('undeclared') || err.includes('not defined')) return `Ye kaun sa naya mehmaan hai? ${lineNo} pe variable declare kar le! 🤔`;
-  if (err.includes("expected '}'") || err.includes("expected '{'")) return `Bhai, bracket ka balance bigad gaya! ${lineNo} check kar! 👐`;
-  if (err.includes('format') && err.includes('expects argument')) return `Bhai, scanf mein '&' lagana bhul gaya? ${lineNo} check kar! 📍`;
-  if (err.includes("undefined reference to `main'")) return "Arre bhai, 'main' function kidhar hai? 🏎️💨";
-  if (err.includes('return') && err.includes('with no value')) return `Bhai, 'int main' hai toh 'return 0' kahan hai? 🤨`;
-  if (err.includes('division by zero')) return `Zero se divide mat kar bhai! ${lineNo} check kar! 💀`;
-  if (err.includes('unused variable')) return `Bhai, variable bana ke chod diya? ${lineNo} use toh kar! 😢`;
-  if (err.includes('indentationerror')) return `Python spacing ka bohot kachcha hai! ${lineNo} par extra space ya kam space check karo. 📏`;
-  if (err.includes('syntaxerror')) return `${lineNo} par syntax galti hai. Colon (:) ya bracket check karo! ⚡`;
-  if (err.includes('typeerror')) return `Bhai, data types match nahi ho rahe. str() ya int() use karo! 🧩`;
-  if (err.includes('indexerror')) return `${lineNo}: List ka index limit ke baahar hai! 🚫`;
-  if (err.includes('cannot find symbol')) return `Java ko ye variable mil nahi raha ${lineNo} par. Capital letters check karo. 🔡`;
-  if (err.includes('timeout') || err.includes('signal: killed')) return 'Bhai, program run hone mein bohot time le raha hai. Loop check karo! 🐢';
-  return `Bhai, ${lineNo} ke aas-paas kuch gadbad hai. Dhyan se dekh le! 🧐`;
-};
 
-app.post('/run', async (req, res) => {
-  const { code, language, input } = req.body;
-  const langConfig = {
-    c: { version: '10.2.0' },
-    python: { version: '3.10.0' },
-    java: { version: '15.0.2' }
-  };
-  try {
-    const response = await axios.post('https://emkc.org/api/v2/piston/execute', {
-      language: language.toLowerCase(),
-      version: langConfig[language.toLowerCase()]?.version || 'latest',
-      files: [{ content: code }],
-      stdin: input || ''
-    });
-    const stderr = response.data.run.stderr;
-    res.json({
-      output: response.data.run.output,
-      stderr,
-      hint: stderr ? getHinglishHint(stderr) : null
-    });
-  } catch {
-    res.status(500).json({ error: 'Server Error' });
-  }
-});
 
 // API Routes
 app.use('/api/auth', authLimiter, authRoutes);
@@ -127,6 +82,7 @@ app.use('/api/payment', paymentRoutes);
 app.use('/api/notes', notesRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/submissions', submissionRoutes);
+
 
 // 404 Handler
 app.use((req, res) => {

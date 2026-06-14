@@ -1,19 +1,24 @@
 import { useEffect, useState } from "react";
 import { FileText, Plus, Trash2, Check, X } from "lucide-react";
 import { getAdminNotes, uploadAdminNotes, approveNotes, deleteNotes } from "../../api/admin.api";
+import { getAllCourses } from "../../api/course.api";
 
-const emptyForm = { title: "", fileUrl: "", subject: "", price: 0, isFree: true };
+const emptyForm = { title: "", fileUrl: "", subject: "", price: 0, isFree: true, course: "" };
 
 export default function AdminNotes() {
   const [notes, setNotes] = useState<any[]>([]);
+  const [courses, setCourses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
 
   const load = () => {
-    getAdminNotes()
-      .then((res) => setNotes(res.data.data || []))
+    Promise.all([getAdminNotes(), getAllCourses()])
+      .then(([notesRes, courseRes]) => {
+        setNotes(notesRes.data.data || []);
+        setCourses(courseRes.data.data || []);
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
   };
@@ -22,7 +27,9 @@ export default function AdminNotes() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setSaving(true);
-    try { await uploadAdminNotes(form); setShowForm(false); setForm(emptyForm); load(); }
+    const payload: any = { ...form };
+    if (payload.course === "") delete payload.course;
+    try { await uploadAdminNotes(payload); setShowForm(false); setForm(emptyForm); load(); }
     catch { alert("Failed to upload."); }
     finally { setSaving(false); }
   };
@@ -68,7 +75,13 @@ export default function AdminNotes() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <input required placeholder="Notes Title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className={inputClass} />
               <input required placeholder="File URL (Google Drive / Cloudinary)" value={form.fileUrl} onChange={(e) => setForm({ ...form, fileUrl: e.target.value })} className={inputClass} />
-              <input placeholder="Subject" value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} className={inputClass} />
+              <div className="grid grid-cols-2 gap-4">
+                <input placeholder="Subject" value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} className={inputClass} />
+                <select value={form.course} onChange={(e) => setForm({ ...form, course: e.target.value })} className={inputClass + " cursor-pointer"}>
+                  <option value="" className="bg-[#0d0d0e] text-white">Select Course (Optional)</option>
+                  {courses.map(c => <option key={c._id} value={c._id} className="bg-[#0d0d0e] text-white">{c.title}</option>)}
+                </select>
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <input type="number" placeholder="Price (₹)" value={form.price} onChange={(e) => setForm({ ...form, price: Number(e.target.value) })} className={inputClass} />
                 <div className="flex items-center gap-3 px-4 py-3 bg-white/[0.03] border border-white/5 rounded-2xl">

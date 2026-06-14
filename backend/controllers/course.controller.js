@@ -1,4 +1,6 @@
 import Course from '../models/Course.js';
+import Problem from '../models/Problem.js';
+import Notes from '../models/Notes.js';
 import ApiResponse from '../utils/ApiResponse.js';
 import ApiError from '../utils/ApiError.js';
 import asyncHandler from '../utils/asyncHandler.js';
@@ -28,4 +30,14 @@ export const updateCourse = asyncHandler(async (req, res) => {
 export const deleteCourse = asyncHandler(async (req, res) => {
   await Course.findByIdAndDelete(req.params.id);
   res.json(new ApiResponse(200, null, 'Course deleted.'));
+});
+
+export const getCourseProblems = asyncHandler(async (req, res) => {
+  const problems = await Problem.find({ course: req.params.id }).sort({ createdAt: -1 });
+  res.json(new ApiResponse(200, problems, 'Course problems fetched.'));
+});
+
+export const getCourseNotes = asyncHandler(async (req, res) => {
+  const notes = await Notes.find({ course: req.params.id, isApproved: true }).sort({ createdAt: -1 });
+  res.json(new ApiResponse(200, notes, 'Course notes fetched.'));
 });

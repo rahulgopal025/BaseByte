@@ -1,12 +1,5 @@
-import React, { useEffect } from "react";
-import Editor from "react-simple-code-editor";
-import Prism from "prismjs";
-import LineNumbers from "./LineNumbers"; 
-
-import "prismjs/themes/prism-tomorrow.css"; 
-import "prismjs/components/prism-c";
-import "prismjs/components/prism-python";
-import "prismjs/components/prism-java";
+import React, { useRef, useEffect } from "react";
+import Editor, { useMonaco } from "@monaco-editor/react";
 
 interface Props {
   code: string;
@@ -17,95 +10,93 @@ interface Props {
 }
 
 const CodeEditor: React.FC<Props> = ({ code, setCode, fontSize, language, errorLine }) => {
-  const shortcuts = ["{", "}", "(", ")", ";", "#", "," ,"<", ">", '"', "=", "/", ".", ":", "+", "-", "*", "_"];
+  const monaco = useMonaco();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const editorRef = useRef<any>(null);
+  const decorationsRef = useRef<string[]>([]);
+
+  // Map backend language keys to monaco supported languages
+  const getMonacoLanguage = (lang: string) => {
+    const map: Record<string, string> = {
+      c: "c", cpp: "cpp", java: "java", python: "python",
+      javascript: "javascript", csharp: "csharp",
+      go: "go", rust: "rust", php: "php", ruby: "ruby"
+    };
+    return map[lang] || "plaintext";
+  };
+
+  const monacoLanguage = getMonacoLanguage(language);
+
+  const handleEditorDidMount = (editor: any) => {
+    editorRef.current = editor;
+  };
+
+  const shortcuts = ["{", "}", "(", ")", ";", "#", ",", "<", ">", '"', "=", "/", ".", ":", "+", "-", "*", "_"];
 
   const handleShortcut = (char: string) => {
-    const textarea = document.querySelector(".custom-editor textarea") as HTMLTextAreaElement;
-    
-    if (textarea) {
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-      const newCode = code.substring(0, start) + char + code.substring(end);
-      
-      setCode(newCode);
-
-      setTimeout(() => {
-        textarea.focus();
-        textarea.selectionStart = textarea.selectionEnd = start + char.length;
-      }, 0);
+    if (editorRef.current) {
+      editorRef.current.focus();
+      editorRef.current.trigger('keyboard', 'type', { text: char });
     } else {
       setCode(code + char);
     }
   };
 
   useEffect(() => {
-    Prism.highlightAll();
-  }, [code, language]);
-
-  
-  const calculatedLineHeight = fontSize * 1.5;
-  const editorPadding = 20;
+    if (editorRef.current && monaco) {
+      if (errorLine && errorLine > 0) {
+        decorationsRef.current = editorRef.current.deltaDecorations(
+          decorationsRef.current,
+          [
+            {
+              range: new monaco.Range(errorLine, 1, errorLine, 1),
+              options: {
+                isWholeLine: true,
+                className: 'bg-red-500/20 border-l-4 border-red-500',
+              }
+            }
+          ]
+        );
+      } else {
+        decorationsRef.current = editorRef.current.deltaDecorations(decorationsRef.current, []);
+      }
+    }
+  }, [errorLine, monaco]);
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden bg-[#0a0a0b]">
-      
-      <div className="flex gap-2 overflow-x-auto p-2 bg-[#111114] border-b border-white/5 no-scrollbar flex-shrink-0">
-        {shortcuts.map((char) => (
-          <button 
-            key={char}
+    <div className="flex-1 flex flex-col overflow-hidden relative bg-[#1e1e1e]">
+      {/* Mobile/Quick Shortcut Bar */}
+      <div className="flex gap-2 overflow-x-auto p-2 bg-[#111114] border-b border-white/5 flex-shrink-0 custom-scrollbar">
+        {shortcuts.map((char, index) => (
+          <button
+            key={index}
             onClick={() => handleShortcut(char)}
-            className="flex-shrink-0 bg-white/10 px-4 py-2 rounded-lg text-sm font-bold active:bg-indigo-600 transition-all text-indigo-300 border border-white/10"
+            className="w-8 h-8 flex-shrink-0 flex items-center justify-center bg-white/5 hover:bg-indigo-500/20 text-indigo-400 hover:text-indigo-300 rounded-lg text-sm font-mono transition-colors"
           >
             {char}
           </button>
         ))}
       </div>
 
-      <div className="flex-1 flex overflow-hidden relative">
-        
-        <LineNumbers 
-          lines={code.split("\n").length} 
-          fontSize={fontSize} 
-          errorLine={errorLine} 
+      <div className="flex-1 relative">
+        <Editor
+          height="100%"
+          language={monacoLanguage}
+          theme="vs-dark"
+          value={code}
+          onChange={(value) => setCode(value || "")}
+          onMount={handleEditorDidMount}
+          options={{
+            fontSize: fontSize,
+            automaticLayout: true,
+            minimap: { enabled: false },
+            scrollBeyondLastLine: false,
+            smoothScrolling: true,
+            fontFamily: '"Fira code", "Fira Mono", monospace',
+            padding: { top: 16 }
+          }}
         />
-
-        <div className="flex-1 overflow-auto relative custom-editor">
-          
-          {errorLine && errorLine > 0 && (
-            <div 
-              style={{
-                position: "absolute",
-                top: `${editorPadding + (errorLine - 1) * calculatedLineHeight}px`,
-                height: `${calculatedLineHeight}px`,
-                left: 0,
-                right: 0,
-                backgroundColor: "rgba(239, 68, 68, 0.2)",
-                borderLeft: "4px solid #ef4444",
-                pointerEvents: "none",
-                zIndex: 0
-              }}
-            />
-          )}
-          <Editor
-            value={code}
-            onValueChange={(code) => setCode(code)}
-            highlight={(code) => Prism.highlight(code, Prism.languages[language] || Prism.languages.c, language)}
-            padding={editorPadding}
-            style={{
-              fontFamily: '"Fira code", "Fira Mono", monospace',
-              fontSize: `${fontSize}px`,
-              lineHeight: `${calculatedLineHeight}px`, 
-              minHeight: "100%",
-              backgroundColor: "transparent",
-              color: "#fff",
-              position: "relative",
-              zIndex: 1
-            }}
-            className="outline-none"
-          />
-        </div>
       </div>
-
     </div>
   );
 };

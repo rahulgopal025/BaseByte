@@ -24,6 +24,23 @@ const problemSchema = new mongoose.Schema({
   },
   tags: [String],
 
+  // Course Association
+  course: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Course',
+    default: null
+  },
+  topic: {
+    type: String,
+    default: ''
+  },
+  
+  // External Platform Links
+  leetCodeUrl: { type: String, default: '' },
+  gfgUrl: { type: String, default: '' },
+  hackerRankUrl: { type: String, default: '' },
+  codeChefUrl: { type: String, default: '' },
+
   // example shown to user
   sampleInput: {
     type: String,

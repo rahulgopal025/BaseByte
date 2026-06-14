@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronRight, Code2, Terminal, Coffee } from "lucide-react";
 import { useProblems } from "../../hooks/useProblems";
-import ProblemCard from "../../components/practice/ProblemCard";
+import ProblemCard from "../../components/Practice/ProblemCard";
 
 export default function Practice() {
   const navigate = useNavigate();

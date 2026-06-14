@@ -14,6 +14,11 @@ const notesSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  course: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Course',
+    default: null
+  },
   fileUrl: {
     type: String,
     default: ''

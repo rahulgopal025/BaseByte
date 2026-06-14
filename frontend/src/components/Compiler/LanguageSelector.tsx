@@ -10,9 +10,16 @@ interface Props {
 const LanguageSelector: React.FC<Props> = ({ language, setLanguage, onLanguageChange }) => {
   // Mapping language values to display names for better UI
   const displayNames: { [key: string]: string } = {
-    c: "C Language",
-    python: "Python 3",
-    java: "Java (Main)"
+    python: "Python",
+    javascript: "JavaScript",
+    c: "C",
+    cpp: "C++",
+    java: "Java",
+    csharp: "C#",
+    php: "PHP",
+    ruby: "Ruby",
+    go: "Go",
+    rust: "Rust"
   };
 
   return (
@@ -30,9 +37,9 @@ const LanguageSelector: React.FC<Props> = ({ language, setLanguage, onLanguageCh
         }}
         className="appearance-none bg-[#1a1a1e] text-[11px] font-bold text-gray-300 pl-8 pr-6 py-2 rounded-xl border border-white/5 outline-none cursor-pointer hover:border-indigo-500/50 hover:bg-[#1f1f23] transition-all shadow-inner tracking-widest uppercase"
       >
-        <option value="c">C </option>
-        <option value="python">Python</option>
-        <option value="java">Java</option>
+        {Object.entries(displayNames).map(([key, name]) => (
+          <option key={key} value={key}>{name}</option>
+        ))}
       </select>
 
       

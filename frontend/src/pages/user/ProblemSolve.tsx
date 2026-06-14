@@ -10,11 +10,7 @@ import axiosInstance from "../../api/axios.instance";
 import { API_ENDPOINTS } from "../../constants/api.constants";
 import { useToastContext } from "../../context/ToastContext";
 
-const codeTemplates: { [key: string]: string } = {
-  c: '#include <stdio.h>\n\nint main() {\n    printf("welcome to BaseByte C!");\n    return 0;\n}',
-  python: 'print("Hello Students, Python is easy!")',
-  java: 'public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello Java World!");\n    }\n}'
-};
+import { codeTemplates, judge0LanguageIds, getSmartHint } from "../../utils/compilerUtils";
 
 export default function ProblemSolve() {
   const { id } = useParams();
@@ -60,31 +56,47 @@ export default function ProblemSolve() {
     setOutput("Compiling your code... ⚙️");
 
     try {
-      const response = await axiosInstance.post(API_ENDPOINTS.RUN, { 
-        code, 
-        language, 
-        input  
+      const encodeBase64 = (str: string) => btoa(unescape(encodeURIComponent(str)));
+      const decodeBase64 = (str: string) => str ? decodeURIComponent(escape(atob(str))) : "";
+
+      const response = await fetch("https://ce.judge0.com/submissions?wait=true&base64_encoded=true", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          source_code: encodeBase64(code),
+          language_id: judge0LanguageIds[language] || 71,
+          stdin: encodeBase64(input || "")
+        })
       });
 
-      const { output: resOutput, stderr, hint: resHint } = response.data;
+      const data = await response.json();
 
-      if (stderr) {
+      const stdout = decodeBase64(data.stdout);
+      const stderr = decodeBase64(data.stderr);
+      const compileOutput = decodeBase64(data.compile_output);
+      const statusDescription = data.status?.description || "Unknown Status";
+
+      if (data.status?.id !== 3) {
         setStatus("error");
-        const lineMatch = stderr.match(/:(?:\s+)?(\d+)(?::\d+)?/);
+        
+        const errorDetails = compileOutput || stderr || "An unknown error occurred";
+        const lineMatch = errorDetails.match(/:(?:\s+)?(\d+)(?::\d+)?/);
         const lineNo = lineMatch ? parseInt(lineMatch[1]) : "X";
-        setErrorLine(lineMatch ? lineNo : null); 
-        const manualHint = resHint || "Bhai, code check kar le!";
-        setOutput(`${stderr}---${manualHint}---${lineNo}`);
-        setHint(manualHint); 
+        setErrorLine(lineMatch ? lineNo : null);
+
+        const smartHint = getSmartHint(errorDetails);
+
+        setOutput(`[${statusDescription}]\n\n${errorDetails}---${smartHint}---${lineNo}`);
+        setHint(smartHint);
       } else {
-        setOutput(resOutput);
+        setOutput(stdout || "Execution successful (no output)");
         setStatus("success");
         setHint("");
       }
-    } catch (error) {
+    } catch (error: any) {
       setStatus("error");
-      setOutput("Connection Error! Is the backend server running?---Check backend connection.---X");
-      setHint("Check backend connection.");
+      setOutput("Compiler Service Unavailable. Please check your network connection.---Check network.---X");
+      setHint("Check network connection.");
     }
   };
 

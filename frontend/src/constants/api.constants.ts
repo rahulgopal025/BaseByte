@@ -15,5 +15,5 @@ export const API_ENDPOINTS = {
   NOTES: '/api/notes',
   FEEDBACK: '/api/feedback',
   SUBMISSIONS: '/api/submissions',
-  RUN: '/run',
+  RUN: '/api/compiler/run',
 } as const;
