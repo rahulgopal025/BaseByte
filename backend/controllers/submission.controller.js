@@ -19,3 +19,11 @@ export const getMySubmissions = asyncHandler(async (req, res) => {
 
   res.json(new ApiResponse(200, submissions, 'Submissions fetched.'));
 });
+
+export const getAllMySubmissions = asyncHandler(async (req, res) => {
+  const submissions = await Submission.find({
+    userId: req.user.id
+  }).select('problemId status createdAt').lean();
+
+  res.json(new ApiResponse(200, submissions, 'All submissions fetched.'));
+});

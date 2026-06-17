@@ -7,7 +7,7 @@ const enrollmentSchema = new mongoose.Schema({
   },
   userEmail: {
     type: String,
-    required: true
+    default: ''
   },
   courseId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -25,6 +25,10 @@ const enrollmentSchema = new mongoose.Schema({
   enrolledAt: {
     type: Date,
     default: Date.now
+  },
+  isCompleted: {
+    type: Boolean,
+    default: false
   }
 }, { timestamps: true });
 

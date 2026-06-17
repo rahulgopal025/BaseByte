@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Menu, X, Code2, Zap } from "lucide-react";
 import UserMenu from "../common/UserMenu";
+import NotificationMenu from "../common/NotificationMenu";
 import { useAuth } from "../../hooks/useAuth"; 
 
 export default function Navbar() {
@@ -30,8 +31,8 @@ export default function Navbar() {
           
           
           <div onClick={() => navigate("/")} className="flex items-center gap-3 cursor-pointer group">
-            <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-2 rounded-xl group-hover:rotate-12 transition-transform shadow-lg shadow-indigo-500/20">
-              <Code2 className="text-white w-6 h-6" />
+            <div className="group-hover:rotate-12 transition-transform shadow-lg shadow-indigo-500/20 rounded-xl">
+              <img src="/logo.png" alt="BaseByte Logo" className="w-8 h-8 object-contain" />
             </div>
             <h1 className="text-2xl font-black bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent tracking-tight">
               BaseByte
@@ -54,9 +55,12 @@ export default function Navbar() {
           </ul>
 
           
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4 md:gap-6">
             {user ? (
-              <UserMenu user={user} onLogout={handleLogout} />
+              <>
+                <NotificationMenu />
+                <UserMenu user={user} onLogout={handleLogout} />
+              </>
             ) : (
               <div className="hidden md:flex items-center gap-6">
                 <button 

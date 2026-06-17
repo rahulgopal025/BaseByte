@@ -47,3 +47,9 @@ export const deleteNotes = (id: string) => axiosInstance.delete(`${BASE}/notes/$
 // Feedback
 export const getAdminFeedback = () => axiosInstance.get(`${BASE}/feedback`);
 export const deleteFeedback = (id: string) => axiosInstance.delete(`${BASE}/feedback/${id}`);
+
+// Notifications
+export const getAdminNotifications = () => axiosInstance.get('/api/notifications/admin');
+export const createAdminNotification = (data: any) => axiosInstance.post('/api/notifications', data);
+export const updateAdminNotification = (id: string, data: any) => axiosInstance.put(`/api/notifications/${id}`, data);
+export const deleteAdminNotification = (id: string) => axiosInstance.delete(`/api/notifications/${id}`);

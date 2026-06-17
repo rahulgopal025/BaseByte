@@ -5,7 +5,7 @@ import {
   LayoutDashboard, Users, BookOpen, Video,
   Code2, FileQuestion, FileText, ClipboardList,
   MessageSquare, LogOut, Code, ChevronLeft,
-  ChevronRight, Zap
+  ChevronRight, Zap, Bell
 } from "lucide-react";
 
 const navItems = [
@@ -28,6 +28,7 @@ const navItems = [
       { label: "Courses", path: "/admin/courses", icon: BookOpen, color: "text-purple-400" },
       { label: "Lectures", path: "/admin/lectures", icon: Video, color: "text-violet-400" },
       { label: "Problems", path: "/admin/problems", icon: Code2, color: "text-emerald-400" },
+      { label: "Practice Paths", path: "/admin/practice-paths", icon: Code2, color: "text-cyan-400" },
       { label: "Quiz", path: "/admin/quiz", icon: FileQuestion, color: "text-yellow-400" },
       { label: "Notes", path: "/admin/notes", icon: FileText, color: "text-pink-400" },
     ]
@@ -36,6 +37,7 @@ const navItems = [
     section: "Reports",
     items: [
       { label: "Feedback", path: "/admin/feedback", icon: MessageSquare, color: "text-rose-400" },
+      { label: "Notifications", path: "/admin/notifications", icon: Bell, color: "text-amber-400" },
     ]
   }
 ];
@@ -63,9 +65,7 @@ export default function AdminSidebar({ onMobileClose }: { onMobileClose?: () => 
       {/* Logo */}
       <div className={`flex items-center justify-between gap-3 p-5 border-b border-white/5 ${collapsed ? "justify-center" : ""}`}>
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0">
-            <Code size={18} className="text-white" />
-          </div>
+          <img src="/logo.png" alt="Logo" className="w-9 h-9 object-contain" />
           {!collapsed && (
             <div>
               <h1 className="text-white font-black text-base leading-tight">BaseByte</h1>

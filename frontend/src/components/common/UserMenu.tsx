@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { User, LogOut, ChevronDown, BookOpen } from "lucide-react";
 import profileBoy from "../../assets/profile-boy.png";
 import type { User as UserType } from "../../types/auth.types";
+import { useProfile } from "../../hooks/useProfile";
 
 interface UserMenuProps {
   user: UserType | null;
@@ -13,6 +14,7 @@ export default function UserMenu({ user, onLogout }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
+  const { profileData } = useProfile();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -33,7 +35,7 @@ export default function UserMenu({ user, onLogout }: UserMenuProps) {
       >
         <div className="relative">
           <img
-            src={profileBoy}
+            src={profileData?.avatar || profileBoy}
             alt="Profile"
             className="w-10 h-10 rounded-full border-2 border-indigo-600 p-0.5 object-cover shadow-lg shadow-indigo-500/20"
           />

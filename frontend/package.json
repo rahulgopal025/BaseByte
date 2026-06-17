@@ -19,6 +19,7 @@
     "papaparse": "^5.5.3",
     "prismjs": "^1.30.0",
     "react": "^19.2.0",
+    "react-activity-calendar": "^3.2.0",
     "react-dom": "^19.2.0",
     "react-resizable-panels": "^4.5.2",
     "react-router-dom": "^7.12.0",

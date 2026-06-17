@@ -1,6 +1,7 @@
 import Course from '../models/Course.js';
 import Problem from '../models/Problem.js';
 import Notes from '../models/Notes.js';
+import Notification from '../models/Notification.js';
 import ApiResponse from '../utils/ApiResponse.js';
 import ApiError from '../utils/ApiError.js';
 import asyncHandler from '../utils/asyncHandler.js';
@@ -18,6 +19,16 @@ export const getCourseById = asyncHandler(async (req, res) => {
 
 export const createCourse = asyncHandler(async (req, res) => {
   const course = await Course.create(req.body);
+
+  // Automatically create a global notification for the new course
+  await Notification.create({
+    title: `New Course Launched! 🎉`,
+    message: `We just launched a new course: "${course.title}". Check it out now!`,
+    type: 'COURSE',
+    isGlobal: true,
+    link: `/courses/${course._id}`
+  });
+
   res.status(201).json(new ApiResponse(201, course, 'Course created.'));
 });
 

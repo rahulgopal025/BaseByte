@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import {
   Users, BookOpen, BarChart3, FileText,
   FileQuestion, ClipboardList, MessageSquare,
-  Zap, ArrowRight, Clock
+  Zap, ArrowRight, Clock, Bell, Send
 } from "lucide-react";
 import { getAdminStats } from "../../api/admin.api";
+import { useToast } from "../../hooks/useToast";
 
 interface Stats {
   totalStudents: number;
@@ -22,6 +23,7 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   useEffect(() => {
     getAdminStats()
@@ -37,7 +39,8 @@ export default function AdminDashboard() {
     { label: "Total Users", value: stats.totalStudents, icon: Users, color: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/20", path: "/admin/students" },
     { label: "Total Courses", value: stats.totalCourses, icon: BookOpen, color: "text-purple-400", bg: "bg-purple-500/10 border-purple-500/20", path: "/admin/courses" },
     { label: "Total Problems", value: stats.totalProblems, icon: BarChart3, color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20", path: "/admin/problems" },
-    { label: "Quiz Questions", value: stats.totalQuizzes, icon: FileQuestion, color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/20", path: "/admin/quiz" },
+    { label: "Total Quizzes", value: stats.totalQuizzes, icon: FileQuestion, color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/20", path: "/admin/quiz" },
+    { label: "Practice Paths", value: "Manage", icon: BarChart3, color: "text-cyan-400", bg: "bg-cyan-500/10 border-cyan-500/20", path: "/admin/practice-paths" },
     { label: "Feedback", value: stats.totalFeedback, icon: MessageSquare, color: "text-rose-400", bg: "bg-rose-500/10 border-rose-500/20", path: "/admin/feedback" },
     { label: "Approved Notes", value: stats.totalNotes, icon: FileText, color: "text-pink-400", bg: "bg-pink-500/10 border-pink-500/20", path: "/admin/notes" },
   ] : [];
@@ -144,6 +147,7 @@ export default function AdminDashboard() {
           </div>
         )}
       </div>
+
     </div>
   );
 }

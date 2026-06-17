@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ProfileProvider } from "./context/ProfileContext";
+import { NotificationProvider } from "./context/NotificationContext";
 import { ToastProvider } from "./context/ToastContext";
 import ErrorBoundary from "./components/common/ErrorBoundary";
 
@@ -19,7 +20,7 @@ import Auth from "./pages/user/Auth";
 import About from "./pages/user/About";
 import Practice from "./pages/user/Practice";
 import Compiler from "./pages/user/Compiler";
-import ProblemDetails from "./pages/user/ProblemDetails";
+import PracticePathDetails from "./pages/user/PracticePathDetails";
 import ProblemSolve from "./pages/user/ProblemSolve";
 import Topics from "./pages/user/Topics";
 import QuizPage from "./pages/user/QuizPage";
@@ -42,14 +43,17 @@ import AdminProblems from "./pages/admin/AdminProblems";
 import AdminQuiz from "./pages/admin/AdminQuiz";
 import AdminFeedback from "./pages/admin/AdminFeedback";
 import AdminNotes from "./pages/admin/AdminNotes";
+import AdminPracticePaths from "./pages/admin/AdminPracticePaths";
+import AdminNotifications from "./pages/admin/AdminNotifications";
 
 export default function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
         <ProfileProvider>
-          <ToastProvider>
-            <Routes>
+          <NotificationProvider>
+            <ToastProvider>
+              <Routes>
 
               {/* USER ROUTES — with Navbar and Footer */}
               <Route element={<UserLayout />}>
@@ -66,7 +70,7 @@ export default function App() {
 
                 <Route element={<ProtectedRoute />}>
                   <Route path="/practice" element={<Practice />} />
-                  <Route path="/practice/:id" element={<ProblemDetails />} />
+                  <Route path="/practice/:id" element={<PracticePathDetails />} />
                   <Route path="/solve/:id" element={<ProblemSolve />} />
                   <Route path="/topics/:lang" element={<Topics />} />
                   <Route path="/quiz/:lang/:topic" element={<QuizPage />} />
@@ -90,14 +94,17 @@ export default function App() {
                   <Route path="/admin/students" element={<AdminStudents />} />
                   <Route path="/admin/enrollments" element={<AdminEnrollments />} />
                   <Route path="/admin/problems" element={<AdminProblems />} />
+                  <Route path="/admin/practice-paths" element={<AdminPracticePaths />} />
                   <Route path="/admin/quiz" element={<AdminQuiz />} />
                   <Route path="/admin/feedback" element={<AdminFeedback />} />
                   <Route path="/admin/notes" element={<AdminNotes />} />
+                  <Route path="/admin/notifications" element={<AdminNotifications />} />
                 </Route>
               </Route>
 
-            </Routes>
-          </ToastProvider>
+              </Routes>
+            </ToastProvider>
+          </NotificationProvider>
         </ProfileProvider>
       </AuthProvider>
     </ErrorBoundary>

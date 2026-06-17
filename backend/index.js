@@ -25,6 +25,8 @@ import paymentRoutes from './routes/payment.routes.js';
 import notesRoutes from './routes/notes.routes.js';
 import feedbackRoutes from './routes/feedback.routes.js';
 import submissionRoutes from './routes/submission.routes.js';
+import practiceRoutes from './routes/practice.routes.js';
+import notificationRoutes from './routes/notification.routes.js';
 
 
 const app = express();
@@ -32,8 +34,8 @@ const app = express();
 // Security & Middlewares
 app.use(helmet());
 app.use(compression());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(morgan('dev'));
 
 // CORS
@@ -82,6 +84,8 @@ app.use('/api/payment', paymentRoutes);
 app.use('/api/notes', notesRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/submissions', submissionRoutes);
+app.use('/api/practice', practiceRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 
 // 404 Handler

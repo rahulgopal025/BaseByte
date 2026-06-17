@@ -10,7 +10,7 @@ import axiosInstance from "../../api/axios.instance";
 import { API_ENDPOINTS } from "../../constants/api.constants";
 import { useToastContext } from "../../context/ToastContext";
 
-import { codeTemplates, judge0LanguageIds, getSmartHint } from "../../utils/compilerUtils";
+import { codeTemplates, judge0LanguageIds } from "../../utils/compilerUtils";
 
 export default function ProblemSolve() {
   const { id } = useParams();
@@ -24,10 +24,9 @@ export default function ProblemSolve() {
   const [code, setCode] = useState(codeTemplates.c);
   const [output, setOutput] = useState("");
   const [status, setStatus] = useState(""); 
-  const [fontSize, setFontSize] = useState(16);
+  const [fontSize, setFontSize] = useState(14);
   const [errorLine, setErrorLine] = useState<number | null>(null);
   const [input, setInput] = useState(""); 
-  const [hint, setHint] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -52,7 +51,6 @@ export default function ProblemSolve() {
   const handleRun = async () => {
     setStatus("loading");
     setErrorLine(null);
-    setHint(""); 
     setOutput("Compiling your code... ⚙️");
 
     try {
@@ -81,22 +79,25 @@ export default function ProblemSolve() {
         
         const errorDetails = compileOutput || stderr || "An unknown error occurred";
         const lineMatch = errorDetails.match(/:(?:\s+)?(\d+)(?::\d+)?/);
-        const lineNo = lineMatch ? parseInt(lineMatch[1]) : "X";
-        setErrorLine(lineMatch ? lineNo : null);
+        const lineNo = lineMatch ? parseInt(lineMatch[1]) : null;
+        setErrorLine(lineNo);
 
-        const smartHint = getSmartHint(errorDetails);
-
-        setOutput(`[${statusDescription}]\n\n${errorDetails}---${smartHint}---${lineNo}`);
-        setHint(smartHint);
+        setOutput(`[${statusDescription}]\n\n${errorDetails}`);
       } else {
-        setOutput(stdout || "Execution successful (no output)");
-        setStatus("success");
-        setHint("");
+        const outNorm = stdout.trim();
+        const expNorm = problem?.sampleOutput?.trim() || "";
+        
+        if (!expNorm || outNorm === expNorm) {
+          setOutput(`[${statusDescription}]\n\n${stdout}`);
+          setStatus("success");
+        } else {
+          setOutput(`[Wrong Answer]\n\nExpected:\n${expNorm}\n\nGot:\n${outNorm}`);
+          setStatus("error");
+        }
       }
-    } catch (error: any) {
+    } catch {
       setStatus("error");
-      setOutput("Compiler Service Unavailable. Please check your network connection.---Check network.---X");
-      setHint("Check network connection.");
+      setOutput("Compiler Service Unavailable. Please check your network connection.");
     }
   };
 

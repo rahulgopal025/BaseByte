@@ -1,117 +1,10 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { Play, RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
-import Groq from "groq-sdk";
 
 import LanguageSelector from "../../components/Compiler/LanguageSelector";
 import CodeEditor from "../../components/Compiler/CodeEditor";
 import Console from "../../components/Compiler/Console";
-import { ChatMessage } from "../../components/Compiler/AIAgent";
-
-const groq = new Groq({
-  apiKey: import.meta.env.VITE_GROQ_API_KEY,
-  dangerouslyAllowBrowser: true
-});
-
-// AI hint for the BaseByte Hint box (short, funny, 1-liner)
-const getAIHint = async (errorText: string, language: string): Promise<string> => {
-  try {
-    const response = await groq.chat.completions.create({
-      model: "llama3-8b-8192",
-      max_tokens: 100,
-      messages: [
-        {
-          role: "system",
-          content: `Tu ek funny coding teacher hai jo Hinglish mein bolta hai (Hindi + English mix). 
-Student ka code mein error aaya hai. 
-Ek single funny helpful hint de — max 1-2 lines, emoji use kar, lovingly roast karo!
-Sirf hint do, kuch aur mat likho.`
-        },
-        {
-          role: "user",
-          content: `Language: ${language}
-Error: ${errorText}
-Ek funny Hinglish hint do is error ke liye!`
-        }
-      ]
-    });
-    return response.choices[0]?.message?.content || "Code dobara dekho bhai! 😅";
-  } catch (err) {
-    return "Kuch toh gadbad hai Daya! 🔍";
-  }
-};
-
-// Full AI response for the chat agent (detailed, with code fixes)
-const getAIResponse = async (
-  userMessage: string,
-  code: string,
-  language: string,
-  error: string,
-  chatHistory: ChatMessage[]
-): Promise<string> => {
-  try {
-    // Build conversation history for context
-    const historyMessages = chatHistory
-      .filter(m => !m.loading)
-      .slice(-10) // Keep last 10 messages for context
-      .map(m => ({
-        role: m.role === "ai" ? "assistant" as const : "user" as const,
-        content: m.content
-      }));
-
-    const response = await groq.chat.completions.create({
-      model: "llama3-8b-8192",
-      max_tokens: 500,
-      messages: [
-        {
-          role: "system",
-          content: `Tu BaseByte ka AI coding assistant hai. 
-Tu Hinglish mein baat karta hai (Hindi + English mix).
-Tu funny aur helpful hai — student ko lovingly roast karta hai but solution bhi deta hai.
-Hamesha current code aur error ko context mein rakh.
-Error hone par:
-1. Pehle ek funny Hinglish hint do (1 line, emoji ke saath)
-2. Phir error ka simple Hindi explanation do
-3. Phir exact fixed code snippet do
-Code complete karne ke liye pucha toh pura code do.
-Short aur clear raho — novel mat likho!`
-        },
-        ...historyMessages,
-        {
-          role: "user",
-          content: `Language: ${language}
-          
-Current Code:
-${code}
-
-Error (if any):
-${error || "No error"}
-
-User ka sawaal: ${userMessage}`
-        }
-      ]
-    });
-    return response.choices[0]?.message?.content || "Kuch toh gadbad hai Daya! 🔍";
-  } catch (err) {
-    return "AI abhi thoda busy hai, thodi der baad try karo! 😅";
-  }
-};
-
-const codeTemplates: { [key: string]: string } = {
-  c: '#include <stdio.h>\n\nint main() {\n    printf("welcome to BaseByte C!");\n    return 0;\n}',
-  cpp: '#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Welcome to BaseByte C++!" << endl;\n    return 0;\n}',
-  java: 'public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello Java World!");\n    }\n}',
-  python: 'print("Hello Students, Python is easy!")',
-  javascript: 'console.log("Welcome to JavaScript!");',
-  csharp: 'using System;\n\nclass Program {\n    static void Main() {\n        Console.WriteLine("Welcome to C#!");\n    }\n}',
-  go: 'package main\n\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Welcome to Go!")\n}',
-  rust: 'fn main() {\n    println!("Welcome to Rust!");\n}',
-  php: '<?php\n\necho "Welcome to PHP!";\n?>',
-  ruby: 'puts "Welcome to Ruby!"'
-};
-
-const judge0LanguageIds: Record<string, number> = {
-  python: 71, javascript: 63, c: 50, cpp: 54, java: 62, csharp: 51, php: 68, ruby: 72, go: 60, rust: 73
-};
+import { codeTemplates, judge0LanguageIds } from "../../utils/compilerUtils";
 
 export default function Compiler() {
   const [compilerMode, setCompilerMode] = useState<"onecompiler" | "basebyte">("onecompiler");
@@ -122,58 +15,32 @@ export default function Compiler() {
   const [fontSize, setFontSize] = useState(14);
   const [errorLine, setErrorLine] = useState<number | null>(null);
   const [input, setInput] = useState("");
-  const [hint, setHint] = useState("");
-
-  // AI Agent state
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [isChatLoading, setIsChatLoading] = useState(false);
-  const [activeConsoleTab, setActiveConsoleTab] = useState<"output" | "input" | "ai-agent">("output");
-  const [lastError, setLastError] = useState("");
-
-  const handleSendChatMessage = useCallback(async (userMessage: string) => {
-    if (isChatLoading) return;
-
-    // Add user message
-    const userMsg: ChatMessage = { role: "user", content: userMessage };
-    const loadingMsg: ChatMessage = { role: "ai", content: "", loading: true };
-    setChatMessages(prev => [...prev, userMsg, loadingMsg]);
-    setIsChatLoading(true);
-
-    try {
-      const aiResponse = await getAIResponse(userMessage, code, language, lastError, chatMessages);
-      setChatMessages(prev =>
-        prev.map((msg, i) =>
-          i === prev.length - 1
-            ? { role: "ai", content: aiResponse, loading: false }
-            : msg
-        )
-      );
-    } catch {
-      setChatMessages(prev =>
-        prev.map((msg, i) =>
-          i === prev.length - 1
-            ? { role: "ai", content: "AI abhi thoda busy hai, thodi der baad try karo! 😅", loading: false }
-            : msg
-        )
-      );
-    } finally {
-      setIsChatLoading(false);
-    }
-  }, [code, language, lastError, chatMessages, isChatLoading]);
 
   const handleRun = async () => {
     setStatus("loading");
     setErrorLine(null);
-    setHint("");
     setOutput("Compiling your code... ⚙️");
 
     try {
       const encodeBase64 = (str: string) => btoa(unescape(encodeURIComponent(str)));
       const decodeBase64 = (str: string) => str ? decodeURIComponent(escape(atob(str))) : "";
 
-      const response = await fetch("https://ce.judge0.com/submissions?wait=true&base64_encoded=true", {
+      const judge0ApiKey = import.meta.env.VITE_JUDGE0_API_KEY;
+      const useRapidApi = judge0ApiKey && judge0ApiKey !== "your_judge0_key_here";
+
+      const judge0Url = useRapidApi
+        ? "https://judge0-ce.p.rapidapi.com/submissions?wait=true&base64_encoded=true"
+        : "https://ce.judge0.com/submissions?wait=true&base64_encoded=true";
+
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (useRapidApi) {
+        headers["X-RapidAPI-Key"] = judge0ApiKey;
+        headers["X-RapidAPI-Host"] = "judge0-ce.p.rapidapi.com";
+      }
+
+      const response = await fetch(judge0Url, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           source_code: encodeBase64(code),
           language_id: judge0LanguageIds[language] || 71,
@@ -182,7 +49,6 @@ export default function Compiler() {
       });
 
       const data = await response.json();
-
       const stdout = decodeBase64(data.stdout);
       const stderr = decodeBase64(data.stderr);
       const compileOutput = decodeBase64(data.compile_output);
@@ -190,60 +56,18 @@ export default function Compiler() {
 
       if (data.status?.id !== 3) {
         setStatus("error");
-
         const errorDetails = compileOutput || stderr || "An unknown error occurred";
         const lineMatch = errorDetails.match(/:(?:\s+)?(\d+)(?::\d+)?/);
-        const lineNo = lineMatch ? parseInt(lineMatch[1]) : "X";
-        setErrorLine(lineMatch ? lineNo : null);
-
+        const lineNo = lineMatch ? parseInt(lineMatch[1]) : null;
+        setErrorLine(lineNo);
         setOutput(`[${statusDescription}]\n\n${errorDetails}`);
-        setLastError(errorDetails);
-
-        // BaseByte Hint (short, 1-liner)
-        setHint("AI soch raha hai... 🤔");
-        getAIHint(errorDetails, language).then((aiHint) => setHint(aiHint));
-
-        // Auto-trigger AI Agent chat with detailed error analysis
-        setActiveConsoleTab("ai-agent");
-        const autoMsg: ChatMessage = { role: "ai", content: "", loading: true };
-        setChatMessages(prev => [...prev, autoMsg]);
-        setIsChatLoading(true);
-
-        getAIResponse(
-          "Is error ko explain karo aur fix batao",
-          code,
-          language,
-          errorDetails,
-          chatMessages
-        ).then((aiResponse) => {
-          setChatMessages(prev =>
-            prev.map((msg, i) =>
-              i === prev.length - 1
-                ? { role: "ai", content: aiResponse, loading: false }
-                : msg
-            )
-          );
-          setIsChatLoading(false);
-        }).catch(() => {
-          setChatMessages(prev =>
-            prev.map((msg, i) =>
-              i === prev.length - 1
-                ? { role: "ai", content: "AI abhi thoda busy hai, thodi der baad try karo! 😅", loading: false }
-                : msg
-            )
-          );
-          setIsChatLoading(false);
-        });
       } else {
         setOutput(`[${statusDescription}]\n\n${stdout}`);
         setStatus("success");
-        setHint("Wah bhai wah! Code chal gaya! 🎉");
-        setLastError("");
       }
-    } catch (error: any) {
+    } catch {
       setStatus("error");
       setOutput("Compiler Service Unavailable. Please check your network connection.");
-      setHint("Check network connection.");
     }
   };
 
@@ -297,7 +121,7 @@ export default function Compiler() {
 
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => { setCode(""); setErrorLine(null); setOutput(""); setInput(""); }}
+                    onClick={() => { setCode(codeTemplates[language] || ""); setErrorLine(null); setOutput(""); setInput(""); }}
                     className="p-2 text-gray-500 hover:text-white"
                   >
                     <RotateCcw size={16} />
@@ -330,13 +154,7 @@ export default function Compiler() {
                 status={status}
                 input={input}
                 setInput={setInput}
-                hint={hint}
                 errorLine={errorLine}
-                chatMessages={chatMessages}
-                onSendChatMessage={handleSendChatMessage}
-                isChatLoading={isChatLoading}
-                activeTab={activeConsoleTab}
-                setActiveTab={setActiveConsoleTab}
               />
             </div>
           </>
