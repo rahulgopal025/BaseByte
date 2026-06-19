@@ -3,6 +3,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { ProfileProvider } from "./context/ProfileContext";
 import { NotificationProvider } from "./context/NotificationContext";
 import { ToastProvider } from "./context/ToastContext";
+import { ThemeProvider } from "./context/ThemeContext";
 import ErrorBoundary from "./components/common/ErrorBoundary";
 
 // Layouts
@@ -28,6 +29,7 @@ import ProfilePage from "./pages/user/ProfilePage";
 import Courses from "./pages/user/Courses";
 import CourseDetails from "./pages/user/CourseDetails";
 import CourseLearning from "./pages/user/CourseLearning";
+import MyCourses from "./pages/user/MyCourses";
 import Notes from "./pages/user/Notes";
 import Checkout from "./pages/user/Checkout";
 import Feedback from "./pages/user/Feedback";
@@ -36,6 +38,7 @@ import NotFound from "./components/common/NotFound";
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminCourses from "./pages/admin/AdminCourses";
+import AdminCourseDetails from "./pages/admin/AdminCourseDetails";
 import AdminLectures from "./pages/admin/AdminLectures";
 import AdminStudents from "./pages/admin/AdminStudents";
 import AdminEnrollments from "./pages/admin/AdminEnrollments";
@@ -53,14 +56,16 @@ export default function App() {
         <ProfileProvider>
           <NotificationProvider>
             <ToastProvider>
-              <Routes>
+              <ThemeProvider>
+                <Routes>
 
-              {/* USER ROUTES — with Navbar and Footer */}
+                {/* USER ROUTES — with Navbar and Footer */}
               <Route element={<UserLayout />}>
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/compiler" element={<Compiler />} />
                 <Route path="/courses" element={<Courses />} />
+                <Route path="/practice" element={<Practice />} />
 
                 <Route element={<GuestRoute />}>
                   <Route path="/auth" element={<Auth />} />
@@ -69,7 +74,6 @@ export default function App() {
                 <Route path="/signup" element={<Navigate to="/auth" replace />} />
 
                 <Route element={<ProtectedRoute />}>
-                  <Route path="/practice" element={<Practice />} />
                   <Route path="/practice/:id" element={<PracticePathDetails />} />
                   <Route path="/solve/:id" element={<ProblemSolve />} />
                   <Route path="/topics/:lang" element={<Topics />} />
@@ -77,6 +81,7 @@ export default function App() {
                   <Route path="/profile" element={<ProfilePage />} />
                   <Route path="/courses/:id" element={<CourseDetails />} />
                   <Route path="/courses/:id/learn" element={<CourseLearning />} />
+                  <Route path="/my-courses" element={<MyCourses />} />
                   <Route path="/notes" element={<Notes />} />
                   <Route path="/checkout/:id" element={<Checkout />} />
                   <Route path="/feedback" element={<Feedback />} />
@@ -90,6 +95,7 @@ export default function App() {
                 <Route element={<AdminLayout />}>
                   <Route path="/admin" element={<AdminDashboard />} />
                   <Route path="/admin/courses" element={<AdminCourses />} />
+                  <Route path="/admin/courses/:id" element={<AdminCourseDetails />} />
                   <Route path="/admin/lectures" element={<AdminLectures />} />
                   <Route path="/admin/students" element={<AdminStudents />} />
                   <Route path="/admin/enrollments" element={<AdminEnrollments />} />
@@ -103,6 +109,7 @@ export default function App() {
               </Route>
 
               </Routes>
+            </ThemeProvider>
             </ToastProvider>
           </NotificationProvider>
         </ProfileProvider>

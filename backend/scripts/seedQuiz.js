@@ -31,3 +31,4 @@ const seedData = async () => {
 };
 
 seedData();
+

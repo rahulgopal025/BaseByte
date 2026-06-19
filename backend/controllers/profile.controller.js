@@ -1,4 +1,5 @@
 import UserProfile from '../models/UserProfile.js';
+import User from '../models/User.js';
 import ApiResponse from '../utils/ApiResponse.js';
 import ApiError from '../utils/ApiError.js';
 import asyncHandler from '../utils/asyncHandler.js';
@@ -111,6 +112,8 @@ export const getProfile = asyncHandler(async (req, res) => {
       email: req.user.email || ''
     });
   }
+
+  const userDoc = await User.findById(req.user.id).select('username provider email');
 
   const userId = req.user.id;
 
@@ -428,6 +431,9 @@ export const getProfile = asyncHandler(async (req, res) => {
   // ─── Response ────────────────────────────────────────────────────────────
   res.json(new ApiResponse(200, {
     ...profile.toObject(),
+    username: userDoc?.username,
+    provider: userDoc?.provider,
+    email: userDoc?.email || profile.email,
     stats,
     codingStats,
     learningStats,
@@ -438,4 +444,42 @@ export const getProfile = asyncHandler(async (req, res) => {
     completionTips,
     enrolledCourses: enrolledCoursesList,
   }, 'Profile fetched successfully.'));
+});
+
+// ─── Update Account Settings ──────────────────────────────────────────────────
+export const updateAccountSettings = asyncHandler(async (req, res) => {
+  const { username, currentPassword, newPassword } = req.body;
+  const user = await User.findById(req.user.id);
+
+  if (!user) {
+    throw new ApiError(404, 'User not found.');
+  }
+
+  // Update Username
+  if (username !== undefined && username.trim() !== '') {
+    const newUsername = username.trim().toLowerCase();
+    if (newUsername !== user.username) {
+      const existingUser = await User.findOne({ username: newUsername });
+      if (existingUser && existingUser._id.toString() !== user._id.toString()) {
+        throw new ApiError(400, 'Username is already taken.');
+      }
+      user.username = newUsername;
+    }
+  }
+
+  // Update Password
+  if (newPassword) {
+    if (!currentPassword) {
+      throw new ApiError(400, 'Current password is required to change your password.');
+    }
+    const isMatch = await user.comparePassword(currentPassword);
+    if (!isMatch) {
+      throw new ApiError(400, 'Incorrect current password.');
+    }
+    user.password = newPassword;
+  }
+
+  await user.save();
+
+  res.json(new ApiResponse(200, { username: user.username }, 'Account settings updated successfully.'));
 });

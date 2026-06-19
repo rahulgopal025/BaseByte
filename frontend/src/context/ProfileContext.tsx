@@ -64,6 +64,9 @@ export interface SkillProgress {
 export interface ProfileData {
   _id?: string;
   userId?: string;
+  username?: string;
+  provider?: string;
+  email?: string;
   firstName?: string;
   midName?: string;
   lastName?: string;
@@ -115,6 +118,7 @@ interface ProfileContextType {
   setProfileData: React.Dispatch<React.SetStateAction<ProfileData | null>>;
   fetchProfile: () => Promise<void>;
   saveProfile: (data: Record<string, unknown>) => Promise<boolean>;
+  updateAccount: (data: { username?: string; currentPassword?: string; newPassword?: string }) => Promise<{ success: boolean; message?: string }>;
   isLoading: boolean;
 }
 
@@ -164,8 +168,21 @@ export const ProfileProvider = ({ children }: { children: React.ReactNode }) => 
     }
   }, [fetchProfile]);
 
+  const updateAccount = useCallback(async (data: { username?: string; currentPassword?: string; newPassword?: string }) => {
+    try {
+      const res = await axiosInstance.put(`${API_ENDPOINTS.PROFILE}/account`, data);
+      if (res.data.data) {
+        await fetchProfile();
+        return { success: true, message: res.data.message };
+      }
+      return { success: false, message: 'Failed to update account.' };
+    } catch (err: any) {
+      return { success: false, message: err?.response?.data?.message || 'Failed to update account.' };
+    }
+  }, [fetchProfile]);
+
   return (
-    <ProfileContext.Provider value={{ profileData, setProfileData, fetchProfile, saveProfile, isLoading }}>
+    <ProfileContext.Provider value={{ profileData, setProfileData, fetchProfile, saveProfile, updateAccount, isLoading }}>
       {children}
     </ProfileContext.Provider>
   );

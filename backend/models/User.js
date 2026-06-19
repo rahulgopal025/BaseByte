@@ -7,6 +7,13 @@ const userSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  username: {
+    type: String,
+    unique: true,
+    sparse: true,
+    trim: true,
+    lowercase: true
+  },
   email: {
     type: String,
     required: true,
@@ -22,6 +29,31 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['student', 'admin'],
     default: 'student'
+  },
+  isVerified: {
+    type: Boolean,
+    default: true // Existing users are kept verified. New local users will be explicitly set to false during OTP flow.
+  },
+  provider: {
+    type: String,
+    enum: ['local', 'google', 'github'],
+    default: 'local'
+  },
+  avatar: {
+    type: String,
+    default: ''
+  },
+  githubUsername: {
+    type: String,
+    default: ''
+  },
+  profileCompleted: {
+    type: Boolean,
+    default: false
+  },
+  lastLogin: {
+    type: Date,
+    default: Date.now
   }
 }, { timestamps: true });
 

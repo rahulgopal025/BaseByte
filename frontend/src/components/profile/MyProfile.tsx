@@ -10,6 +10,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import type { Badge, ActivityItem, SkillProgress } from "../../context/ProfileContext";
 import { ActivityCalendar } from 'react-activity-calendar';
+import AccountSettings from "./AccountSettings";
 
 // ─── Stat Card Component ─────────────────────────────────────────────────────
 function StatCard({ icon, label, value, accent, sub }: {
@@ -207,7 +208,7 @@ export default function MyProfile({ setView }: { setView: (v: string) => void })
   const { profileData } = useProfile();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'overview' | 'coding' | 'achievements'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'coding' | 'achievements' | 'settings'>('overview');
 
   const codingStats = profileData?.codingStats;
   const learningStats = profileData?.learningStats;
@@ -392,6 +393,7 @@ export default function MyProfile({ setView }: { setView: (v: string) => void })
               { id: 'overview' as const, label: 'Overview', icon: <BarChart3 size={15} /> },
               { id: 'coding' as const, label: 'Coding Stats', icon: <Code2 size={15} /> },
               { id: 'achievements' as const, label: 'Achievements', icon: <Trophy size={15} /> },
+              { id: 'settings' as const, label: 'Account Settings', icon: <ShieldCheck size={15} /> },
             ].map(tab => (
               <button key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
@@ -666,6 +668,13 @@ export default function MyProfile({ setView }: { setView: (v: string) => void })
                 )}
               </div>
             </div>
+          )}
+
+          {/* ═══════════════════════════════════════════════════════════════════
+               SETTINGS TAB
+             ═══════════════════════════════════════════════════════════════════ */}
+          {activeTab === 'settings' && (
+            <AccountSettings />
           )}
         </>
       )}

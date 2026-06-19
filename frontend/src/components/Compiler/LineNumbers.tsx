@@ -3,7 +3,7 @@ import React from "react";
 interface Props {
   lines: number;
   fontSize: number;
-  errorLine: number | null; 
+  errorLine: number | null;
 }
 
 const LineNumbers: React.FC<Props> = ({ lines, fontSize, errorLine }) => {

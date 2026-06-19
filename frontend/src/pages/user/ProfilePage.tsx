@@ -63,6 +63,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-[#050505] pt-20 pb-20 px-4 md:px-6">
       {view === "display" ? <MyProfile setView={setView} /> : <CompleteProfile setView={setView} />}
+      
     </div>
 
   

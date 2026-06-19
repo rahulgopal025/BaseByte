@@ -11,7 +11,6 @@ interface Props {
 
 const CodeEditor: React.FC<Props> = ({ code, setCode, fontSize, language, errorLine }) => {
   const monaco = useMonaco();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editorRef = useRef<any>(null);
   const decorationsRef = useRef<string[]>([]);
 
@@ -65,7 +64,6 @@ const CodeEditor: React.FC<Props> = ({ code, setCode, fontSize, language, errorL
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden relative bg-[#1e1e1e]">
-      {/* Mobile/Quick Shortcut Bar */}
       <div className="flex gap-2 overflow-x-auto p-2 bg-[#111114] border-b border-white/5 flex-shrink-0 custom-scrollbar">
         {shortcuts.map((char, index) => (
           <button
@@ -102,3 +100,5 @@ const CodeEditor: React.FC<Props> = ({ code, setCode, fontSize, language, errorL
 };
 
 export default CodeEditor;
+
+

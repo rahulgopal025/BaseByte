@@ -100,7 +100,35 @@ router.put('/enrollments/status', asyncHandler(async (req, res) => {
 
 // ─── COURSE MANAGEMENT ───────────────────────────────────────────
 router.get('/courses', asyncHandler(async (req, res) => {
-  const courses = await Course.find().sort({ createdAt: -1 });
+  const courses = await Course.aggregate([
+    {
+      $lookup: {
+        from: 'enrollments',
+        localField: '_id',
+        foreignField: 'courseId',
+        as: 'enrollments'
+      }
+    },
+    {
+      $addFields: {
+        enrolledCount: {
+          $size: {
+            $filter: {
+              input: "$enrollments",
+              as: "enrollment",
+              cond: { $eq: ["$$enrollment.status", "approved"] }
+            }
+          }
+        }
+      }
+    },
+    {
+      $project: {
+        enrollments: 0 // Remove the raw array to save bandwidth
+      }
+    },
+    { $sort: { createdAt: -1 } }
+  ]);
   res.json(new ApiResponse(200, courses, 'Courses fetched.'));
 }));
 

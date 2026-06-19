@@ -2,9 +2,11 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronRight, Code2, Terminal, Coffee, Map, Sparkles, ArrowRight, Activity } from "lucide-react";
 import { getAllPracticePaths } from "../../api/practice.api";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function Practice() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [paths, setPaths] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -82,7 +84,10 @@ export default function Practice() {
           {languages.map((lang, idx) => (
             <div
               key={lang.id}
-              onClick={() => navigate(`/topics/${lang.id}`)}
+              onClick={() => {
+                if (!user) navigate("/auth");
+                else navigate(`/topics/${lang.id}`);
+              }}
               className={`group relative p-8 rounded-[32px] border ${lang.border} bg-gradient-to-br ${lang.theme} backdrop-blur-sm cursor-pointer transition-all duration-500 hover:-translate-y-3 shadow-lg hover:shadow-2xl overflow-hidden animate-fade-in-up`}
               style={{ animationDelay: `${300 + idx * 100}ms` }}
             >
@@ -132,7 +137,10 @@ export default function Practice() {
               {paths.map((path, idx) => (
                 <div 
                   key={path._id}
-                  onClick={() => navigate(`/practice/${path._id}`)}
+                  onClick={() => {
+                    if (!user) navigate("/auth");
+                    else navigate(`/practice/${path._id}`);
+                  }}
                   className="group relative bg-[#0d0d0e]/80 backdrop-blur-xl border border-white/5 hover:border-cyan-500/30 rounded-[32px] p-8 cursor-pointer transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(6,182,212,0.15)] overflow-hidden animate-fade-in-up"
                   style={{ animationDelay: `${200 + idx * 100}ms` }}
                 >

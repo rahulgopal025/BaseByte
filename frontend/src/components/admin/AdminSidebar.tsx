@@ -4,8 +4,8 @@ import { useAuth } from "../../hooks/useAuth";
 import {
   LayoutDashboard, Users, BookOpen, Video,
   Code2, FileQuestion, FileText, ClipboardList,
-  MessageSquare, LogOut, Code, ChevronLeft,
-  ChevronRight, Zap, Bell
+  MessageSquare, ChevronLeft, LogOut,
+  ChevronRight, Bell
 } from "lucide-react";
 
 const navItems = [
@@ -158,3 +158,5 @@ export default function AdminSidebar({ onMobileClose }: { onMobileClose?: () => 
     </aside>
   );
 }
+
+

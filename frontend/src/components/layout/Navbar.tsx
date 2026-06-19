@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, Code2, Zap } from "lucide-react";
+import { Menu, X, Code2, Zap, Sun, Moon } from "lucide-react";
 import UserMenu from "../common/UserMenu";
 import NotificationMenu from "../common/NotificationMenu";
 import { useAuth } from "../../hooks/useAuth"; 
+import { useTheme } from "../../context/ThemeContext";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ export default function Navbar() {
   
   
   const { user, logout } = useAuth(); 
+  const { theme, toggleTheme } = useTheme();
 
   
   const handleLogout = () => {
@@ -25,7 +27,7 @@ export default function Navbar() {
 
   return (
     
-    <nav className="fixed top-0 w-full z-50 bg-[#050505]/80 backdrop-blur-xl border-b border-white/5 shadow-2xl">
+    <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-border shadow-2xl transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-18 items-center py-4">
           
@@ -46,7 +48,7 @@ export default function Navbar() {
               <li 
                 key={path}
                 onClick={() => navigate(path)} 
-                className={`cursor-pointer hover:text-white transition-all duration-300 relative group ${isActive(path)}`}
+                className={`cursor-pointer hover:text-foreground transition-all duration-300 relative group ${location.pathname === path ? "text-indigo-400" : "text-muted"}`}
               >
                 {path === "/" ? "Home" : path.replace("/", "")}
                 <span className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-500 transition-all duration-300 group-hover:w-full ${location.pathname === path ? "w-full" : ""}`}></span>
@@ -56,6 +58,13 @@ export default function Navbar() {
 
           
           <div className="flex items-center gap-4 md:gap-6">
+            <button
+              onClick={toggleTheme}
+              className="p-2 text-muted hover:text-foreground transition-colors rounded-xl bg-card border border-border"
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
             {user ? (
               <>
                 <NotificationMenu />
@@ -88,8 +97,8 @@ export default function Navbar() {
 
        
       {isOpen && (
-        <div className="md:hidden bg-[#0A0A0C]/95 backdrop-blur-2xl border-b border-white/5 p-6 space-y-6 shadow-2xl animate-in slide-in-from-top duration-300">
-          <div className="flex flex-col gap-6 font-bold text-gray-400 text-lg">
+        <div className="md:hidden bg-card/95 backdrop-blur-2xl border-b border-border p-6 space-y-6 shadow-2xl animate-in slide-in-from-top duration-300">
+          <div className="flex flex-col gap-6 font-bold text-muted text-lg">
             {["Home", ...(user ? ["Practice"] : []), "Compiler", "Courses", "About"].map((item) => (
               <p key={item} onClick={() => {navigate(item === "Home" ? "/" : `/${item.toLowerCase()}`); setIsOpen(false)}} className="hover:text-indigo-400 transition-colors cursor-pointer capitalize">
                 {item}

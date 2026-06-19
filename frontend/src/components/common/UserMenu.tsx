@@ -71,7 +71,7 @@ export default function UserMenu({ user, onLogout }: UserMenuProps) {
             </button>
 
             <button
-              onClick={() => { navigate("/courses"); setIsOpen(false); }}
+              onClick={() => { navigate("/my-courses"); setIsOpen(false); }}
               className="w-full flex items-center gap-4 px-5 py-3 text-sm font-bold text-gray-400 hover:text-white hover:bg-white/5 rounded-2xl transition-all group"
             >
               <div className="p-2 bg-white/5 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-all">

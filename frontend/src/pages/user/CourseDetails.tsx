@@ -80,46 +80,105 @@ export default function CourseDetails() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left — Course Info */}
           <div className="lg:col-span-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-zinc-400 text-xs font-black uppercase tracking-widest mb-4">
-              <Tag size={11} /> {course.category || "Course"}
-            </div>
-            <h1 className="text-4xl font-black tracking-tighter mb-4">{course.title}</h1>
-            <p className="text-zinc-400 text-lg leading-relaxed mb-8">{course.description}</p>
-
-            {/* Meta */}
-            <div className="flex flex-wrap gap-4 mb-8">
-              <div className="flex items-center gap-2 text-zinc-500 text-sm">
-                <User size={14} className="text-indigo-400" />
-                <span>{course.instructor || "BaseByte Team"}</span>
+            {/* Badges */}
+            <div className="flex flex-wrap gap-2 mb-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-zinc-400 text-xs font-black uppercase tracking-widest">
+                <Tag size={12} /> {course.category || "Course"}
               </div>
-              {course.tags?.length > 0 && (
-                <div className="flex items-center gap-2 flex-wrap">
-                  {course.tags.map((tag: string) => (
-                    <span key={tag} className="px-2 py-0.5 bg-white/5 text-zinc-500 text-xs rounded-md font-bold">{tag}</span>
-                  ))}
+              {course.isFeatured && (
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#fbbf24]/10 border border-[#fbbf24]/20 text-[#fbbf24] text-xs font-black uppercase tracking-widest">
+                  Featured
                 </div>
               )}
             </div>
 
+            <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-6 leading-tight">
+              {course.title}
+            </h1>
+            
+            <p className="text-[#9ca3af] text-[17px] leading-relaxed mb-10">
+              {course.description}
+            </p>
 
+            {/* Quick Details Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 p-6 bg-white/[0.02] border border-white/5 rounded-[1.5rem] mb-8">
+              {course.instructor && (
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.15em]">Instructor</span>
+                  <div className="flex items-center gap-2 text-[#cbd5e1] font-medium text-sm">
+                    <span className="text-lg">👩‍🏫</span> <span className="truncate">{course.instructor}</span>
+                  </div>
+                </div>
+              )}
+              {course.level && (
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.15em]">Level</span>
+                  <div className="flex items-center gap-2 text-[#cbd5e1] font-medium text-sm">
+                    <span className="text-lg">🔍</span> <span className="truncate">{course.level}</span>
+                  </div>
+                </div>
+              )}
+              {course.duration && (
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.15em]">Duration</span>
+                  <div className="flex items-center gap-2 text-[#cbd5e1] font-medium text-sm">
+                    <span className="text-lg">⏱️</span> <span className="truncate">{course.duration}</span>
+                  </div>
+                </div>
+              )}
+              {course.lessonsCount && (
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.15em]">Lessons</span>
+                  <div className="flex items-center gap-2 text-[#cbd5e1] font-medium text-sm">
+                    <span className="text-lg">📚</span> <span className="truncate">{course.lessonsCount}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Tags */}
+            {course.tags?.length > 0 && (
+              <div className="flex items-center gap-2 flex-wrap mb-8">
+                {course.tags.map((tag: string) => (
+                  <span key={tag} className="px-3 py-1 bg-white/5 border border-white/5 text-zinc-400 text-xs rounded-lg font-bold">
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Right — Enroll Card */}
           <div className="lg:col-span-1">
             <div className="bg-[#0d0d0e] border border-white/5 rounded-[32px] p-6 sticky top-24">
               {/* Price */}
-              <div className="text-4xl font-black mb-2">
-                {course.isFree ? (
-                  <span className="text-green-400">Free</span>
-                ) : (
-                  <span className="flex items-center gap-1">
-                    <IndianRupee size={28} className="text-indigo-400" />
-                    {course.price}
+              {/* Price */}
+              <div className="flex flex-col mb-6">
+                {course.discountPercentage && !course.isFree && (
+                  <span className="inline-block w-fit mb-3 text-[11px] font-black px-2.5 py-1 bg-[#ef4444] text-white rounded-md shadow-md uppercase tracking-wider">
+                    {course.discountPercentage}
                   </span>
                 )}
+                
+                <div className="flex items-end gap-3">
+                  {course.isFree ? (
+                    <span className="text-[40px] font-black text-green-400 leading-none">Free</span>
+                  ) : (
+                    <>
+                      <span className="text-[40px] font-black text-white leading-none tracking-tight">
+                        ₹{course.price}
+                      </span>
+                      {course.originalPrice > 0 && (
+                        <span className="text-xl font-medium text-zinc-500 line-through leading-none mb-1">
+                          ₹{course.originalPrice}
+                        </span>
+                      )}
+                    </>
+                  )}
+                </div>
               </div>
               {!course.isFree && (
-                <p className="text-zinc-500 text-xs mb-4">One-time payment. Lifetime access.</p>
+                <p className="text-zinc-500 text-sm font-medium mb-6">One-time payment. Lifetime access.</p>
               )}
 
               {/* Enroll Button */}

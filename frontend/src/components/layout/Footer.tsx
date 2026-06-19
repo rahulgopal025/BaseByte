@@ -9,10 +9,10 @@ export default function Footer() {
   return (
     <footer className="bg-[#0a0a0b] text-white pt-16 pb-8 border-t border-white/5">
       <div className="max-w-7xl mx-auto px-6">
-        
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-          
-          
+
+
           <div className="space-y-4">
             <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/")}>
               <div className="bg-indigo-600 p-1.5 rounded-lg">
@@ -27,7 +27,7 @@ export default function Footer() {
             </p>
           </div>
 
-          
+
           <div>
             <h3 className="text-sm font-bold uppercase tracking-widest text-gray-200 mb-5">Platform</h3>
             <ul className="space-y-3 text-gray-400 text-sm">
@@ -37,7 +37,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          
+
           <div>
             <h3 className="text-sm font-bold uppercase tracking-widest text-gray-200 mb-5">Support</h3>
             <ul className="space-y-3 text-gray-400 text-sm">
@@ -47,7 +47,7 @@ export default function Footer() {
             </ul>
           </div>
 
-         
+
           <div className="space-y-5">
             <h3 className="text-sm font-bold uppercase tracking-widest text-gray-200 mb-5">Connect</h3>
             <div className="flex gap-4">
@@ -62,13 +62,13 @@ export default function Footer() {
               </div>
             </div>
             <div className="flex items-center gap-2 text-gray-400 text-xs font-bold pt-2">
-              <Mail size={14} /> basebyte@gmail.com
+              <Mail size={14} /> basebyte.in@gmail.com
             </div>
           </div>
 
         </div>
 
-        
+
         <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
           <p>© {year} BaseByte India | Designed & Developed by Rahul Gopal</p>
           <div className="flex items-center gap-1">

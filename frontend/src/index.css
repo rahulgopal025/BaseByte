@@ -1,5 +1,65 @@
 @import "tailwindcss";
 
+@theme {
+  --color-background: var(--bg-primary);
+  --color-foreground: var(--text-primary);
+  --color-card: var(--bg-card);
+  --color-border: var(--border-color);
+  --color-muted: var(--text-muted);
+}
+
+@layer base {
+  :root {
+    /* Light Mode Tokens */
+    --bg-primary: #ffffff;
+    --text-primary: #111827; /* gray-900 */
+    --bg-card: #f9fafb; /* gray-50 */
+    --border-color: rgba(0, 0, 0, 0.1);
+    --text-muted: #6b7280; /* gray-500 */
+  }
+  
+  .dark {
+    /* Dark Mode Tokens (Current Look) */
+    --bg-primary: #050505;
+    --text-primary: #ffffff;
+    --bg-card: #0A0A0C;
+    --border-color: rgba(255, 255, 255, 0.05);
+    --text-muted: #9ca3af; /* gray-400 */
+  }
+
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+  }
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
 
 /* Hide scrollbar for Chrome, Safari and Opera */ 
 .no-scrollbar::-webkit-scrollbar {

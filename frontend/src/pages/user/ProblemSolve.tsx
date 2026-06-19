@@ -128,19 +128,19 @@ export default function ProblemSolve() {
   return (
     <div className="h-screen bg-[#050505] flex flex-col overflow-hidden font-['Public_Sans',_sans-serif]">
       
-      <header className="h-16 border-b border-white/5 flex items-center justify-between px-6 bg-[#0d0d0e] shrink-0">
-        <div className="flex items-center gap-6">
+      <header className="h-16 border-b border-white/5 flex items-center justify-between px-4 sm:px-6 bg-[#0d0d0e] shrink-0">
+        <div className="flex items-center gap-3 sm:gap-6">
           <button 
             onClick={() => navigate(-1)}
-            className="p-2 hover:bg-white/5 rounded-xl text-zinc-500 hover:text-white transition-all"
+            className="p-2 hover:bg-white/5 rounded-xl text-zinc-500 hover:text-white transition-all shrink-0"
           >
             <ChevronLeft size={20} />
           </button>
-          <div className="h-6 w-[1px] bg-white/10"></div>
-          <h2 className="font-black text-sm tracking-tight text-white uppercase">{problem?.title}</h2>
+          <div className="h-6 w-[1px] bg-white/10 shrink-0"></div>
+          <h2 className="font-black text-xs sm:text-sm tracking-tight text-white uppercase truncate max-w-[150px] sm:max-w-xs">{problem?.title}</h2>
         </div>
         
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 shrink-0">
           <div className="flex items-center gap-2 px-3 py-1.5 bg-indigo-600/10 border border-indigo-500/20 rounded-lg">
             <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></div>
             <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Active Challenge</span>
@@ -148,9 +148,9 @@ export default function ProblemSolve() {
         </div>
       </header>
 
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         
-        <div className="w-1/3 border-r border-white/5 flex flex-col bg-[#0d0d0e]">
+        <div className="w-full lg:w-1/3 h-1/3 lg:h-auto border-b lg:border-b-0 lg:border-r border-white/5 flex flex-col bg-[#0d0d0e] shrink-0">
           <div className="flex items-center gap-2 p-4 border-b border-white/5 bg-white/[0.02]">
             <Info size={14} className="text-indigo-400" />
             <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Description</span>
@@ -182,8 +182,8 @@ export default function ProblemSolve() {
 
         <div className="flex-1 flex flex-col overflow-hidden relative">
           <div className="w-full flex-1 border-b border-white/5 flex flex-col overflow-hidden focus-within:outline-none">
-            <div className="bg-[#111114] p-3 flex flex-shrink-0 justify-between items-center px-4 md:px-6 border-b border-white/5 z-10 focus-within:outline-none focus:outline-none">
-              <div className="flex items-center gap-2">
+            <div className="bg-[#111114] p-3 flex flex-col sm:flex-row flex-shrink-0 justify-between items-start sm:items-center gap-3 px-4 md:px-6 border-b border-white/5 z-10 focus-within:outline-none focus:outline-none overflow-x-auto">
+              <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
                 <LanguageSelector 
                   language={language} 
                   setLanguage={setLanguage} 
@@ -195,8 +195,8 @@ export default function ProblemSolve() {
                   }}
                 />
                 <div className="flex items-center gap-1 bg-white/5 px-2 py-1 rounded-lg">
-                  <button onClick={() => setFontSize(Math.max(12, fontSize - 2))} className="p-1"><ZoomOut size={14}/></button>
-                  <button onClick={() => setFontSize(Math.min(24, fontSize + 2))} className="p-1"><ZoomIn size={14}/></button>
+                  <button onClick={() => setFontSize(Math.max(12, fontSize - 2))} className="p-1 text-zinc-400 hover:text-white transition-colors"><ZoomOut size={14}/></button>
+                  <button onClick={() => setFontSize(Math.min(24, fontSize + 2))} className="p-1 text-zinc-400 hover:text-white transition-colors"><ZoomIn size={14}/></button>
                 </div>
               </div>
 

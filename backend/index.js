@@ -27,6 +27,7 @@ import feedbackRoutes from './routes/feedback.routes.js';
 import submissionRoutes from './routes/submission.routes.js';
 import practiceRoutes from './routes/practice.routes.js';
 import notificationRoutes from './routes/notification.routes.js';
+import contactRoutes from './routes/contact.routes.js';
 
 
 const app = express();
@@ -86,6 +87,7 @@ app.use('/api/feedback', feedbackRoutes);
 app.use('/api/submissions', submissionRoutes);
 app.use('/api/practice', practiceRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/contact', contactRoutes);
 
 
 // 404 Handler

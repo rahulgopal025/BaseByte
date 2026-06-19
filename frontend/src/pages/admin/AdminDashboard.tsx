@@ -80,27 +80,29 @@ export default function AdminDashboard() {
 
       {/* Stat Cards */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-12">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="h-32 bg-zinc-900 rounded-[24px] animate-pulse border border-white/5" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-10">
+          {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+            <div key={i} className="h-20 bg-[#0d0d0e] rounded-2xl animate-pulse border border-white/5" />
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-10">
           {statCards.map((card) => (
             <div
               key={card.label}
               onClick={() => navigate(card.path)}
-              className="bg-[#0d0d0e] border border-white/5 rounded-[24px] p-6 cursor-pointer hover:border-white/10 hover:-translate-y-1 transition-all duration-300 group"
+              className="bg-[#0d0d0e] border border-white/5 rounded-2xl p-4 cursor-pointer hover:border-white/10 hover:-translate-y-0.5 transition-all duration-300 group flex items-center justify-between shadow-sm"
             >
-              <div className={`inline-flex p-3 rounded-2xl border mb-4 ${card.bg}`}>
-                <card.icon size={20} className={card.color} />
+              <div className="flex items-center gap-3.5">
+                <div className={`inline-flex p-2.5 rounded-xl border ${card.bg}`}>
+                  <card.icon size={18} className={card.color} />
+                </div>
+                <div>
+                  <div className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-1">{card.label}</div>
+                  <div className="text-2xl font-black leading-none">{card.value}</div>
+                </div>
               </div>
-              <div className="text-4xl font-black mb-1">{card.value}</div>
-              <div className="text-zinc-500 text-sm font-bold flex items-center justify-between">
-                {card.label}
-                <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 transition-opacity text-zinc-400" />
-              </div>
+              <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-zinc-600 group-hover:text-white" />
             </div>
           ))}
         </div>
