@@ -43,7 +43,7 @@ export default function NotificationMenu() {
 
       {isOpen && (
         <div className="fixed right-4 md:right-24 top-20 w-80 max-h-[28rem] flex flex-col bg-[#0A0A0C]/95 backdrop-blur-xl border border-white/10 rounded-[2rem] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] z-[100] animate-in fade-in slide-in-from-right-5 duration-300 overflow-hidden">
-          
+
           <div className="px-6 py-4 border-b border-white/5 flex justify-between items-center bg-white/[0.01]">
             <h3 className="font-black text-white text-lg">Notifications</h3>
             {unreadCount > 0 && (
@@ -62,7 +62,7 @@ export default function NotificationMenu() {
             ) : (
               <div className="space-y-1">
                 {notifications.map((notif) => (
-                  <div 
+                  <div
                     key={notif._id}
                     onClick={() => handleNotificationClick(notif)}
                     className={`p-4 rounded-xl cursor-pointer transition-all ${notif.isRead ? 'hover:bg-white/5' : 'bg-indigo-500/5 hover:bg-indigo-500/10'}`}
@@ -78,7 +78,7 @@ export default function NotificationMenu() {
                         {new Date(notif.createdAt).toLocaleDateString()}
                       </span>
                     </div>
-                    
+
                     <p className={`text-xs mt-1 line-clamp-2 ${notif.isRead ? 'text-white/40' : 'text-white/60'}`}>
                       {notif.message}
                     </p>

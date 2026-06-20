@@ -46,7 +46,7 @@ export default function AdminDashboard() {
   ] : [];
 
   return (
-    <div className="p-8 text-white">
+    <div className="p-8 text-foreground">
       {/* Header */}
       <div className="flex items-center gap-3 mb-2">
         <div className="p-2 bg-indigo-600/10 border border-indigo-500/20 rounded-xl">
@@ -68,7 +68,7 @@ export default function AdminDashboard() {
               <ClipboardList size={18} className="text-orange-400" />
             </div>
             <div>
-              <p className="text-white font-black">
+              <p className="text-foreground font-black">
                 {stats.pendingEnrollments} Pending Enrollment{stats.pendingEnrollments > 1 ? "s" : ""}
               </p>
               <p className="text-zinc-500 text-sm">Waiting for your approval</p>
@@ -82,7 +82,7 @@ export default function AdminDashboard() {
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-10">
           {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-            <div key={i} className="h-20 bg-[#0d0d0e] rounded-2xl animate-pulse border border-white/5" />
+            <div key={i} className="h-20 bg-card rounded-2xl animate-pulse border border-border" />
           ))}
         </div>
       ) : (
@@ -91,7 +91,7 @@ export default function AdminDashboard() {
             <div
               key={card.label}
               onClick={() => navigate(card.path)}
-              className="bg-[#0d0d0e] border border-white/5 rounded-2xl p-4 cursor-pointer hover:border-white/10 hover:-translate-y-0.5 transition-all duration-300 group flex items-center justify-between shadow-sm"
+              className="bg-card border border-border rounded-2xl p-4 cursor-pointer hover:border-zinc-400 dark:hover:border-white/10 hover:-translate-y-0.5 transition-all duration-300 group flex items-center justify-between shadow-sm"
             >
               <div className="flex items-center gap-3.5">
                 <div className={`inline-flex p-2.5 rounded-xl border ${card.bg}`}>
@@ -102,14 +102,14 @@ export default function AdminDashboard() {
                   <div className="text-2xl font-black leading-none">{card.value}</div>
                 </div>
               </div>
-              <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-zinc-600 group-hover:text-white" />
+              <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-zinc-600 group-hover:text-foreground" />
             </div>
           ))}
         </div>
       )}
 
       {/* Recent Students */}
-      <div className="bg-[#0d0d0e] border border-white/5 rounded-[24px] p-6">
+      <div className="bg-card border border-border rounded-[24px] p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-black">Recent Signups</h2>
           <button
@@ -122,7 +122,7 @@ export default function AdminDashboard() {
         {loading ? (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-14 bg-zinc-900 rounded-2xl animate-pulse" />
+              <div key={i} className="h-14 bg-black/5 dark:bg-white/5 rounded-2xl animate-pulse" />
             ))}
           </div>
         ) : stats?.recentStudents.length === 0 ? (
@@ -130,13 +130,13 @@ export default function AdminDashboard() {
         ) : (
           <div className="space-y-2">
             {stats?.recentStudents.map((student) => (
-              <div key={student._id} className="flex items-center justify-between p-4 bg-white/[0.02] rounded-2xl hover:bg-white/[0.04] transition-colors">
+              <div key={student._id} className="flex items-center justify-between p-4 bg-black/5 dark:bg-white/[0.02] rounded-2xl hover:bg-black/10 dark:hover:bg-white/[0.04] transition-colors">
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 bg-indigo-600/20 rounded-full flex items-center justify-center">
                     <span className="text-indigo-400 text-sm font-black">{student.name.charAt(0).toUpperCase()}</span>
                   </div>
                   <div>
-                    <p className="text-white text-sm font-bold">{student.name}</p>
+                    <p className="text-foreground text-sm font-bold">{student.name}</p>
                     <p className="text-zinc-500 text-xs">{student.email}</p>
                   </div>
                 </div>

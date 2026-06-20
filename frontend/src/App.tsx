@@ -4,6 +4,7 @@ import { ProfileProvider } from "./context/ProfileContext";
 import { NotificationProvider } from "./context/NotificationContext";
 import { ToastProvider } from "./context/ToastContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import { BreadcrumbProvider } from "./context/BreadcrumbContext";
 import ErrorBoundary from "./components/common/ErrorBoundary";
 
 // Layouts
@@ -38,9 +39,12 @@ import NotFound from "./components/common/NotFound";
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminCourses from "./pages/admin/AdminCourses";
+import AdminCourseForm from "./pages/admin/AdminCourseForm";
 import AdminCourseDetails from "./pages/admin/AdminCourseDetails";
+import AdminLectureForm from "./pages/admin/AdminLectureForm";
 import AdminLectures from "./pages/admin/AdminLectures";
 import AdminStudents from "./pages/admin/AdminStudents";
+import AdminStudentProfile from "./pages/admin/AdminStudentProfile";
 import AdminEnrollments from "./pages/admin/AdminEnrollments";
 import AdminProblems from "./pages/admin/AdminProblems";
 import AdminQuiz from "./pages/admin/AdminQuiz";
@@ -57,7 +61,8 @@ export default function App() {
           <NotificationProvider>
             <ToastProvider>
               <ThemeProvider>
-                <Routes>
+                <BreadcrumbProvider>
+                  <Routes>
 
                 {/* USER ROUTES — with Navbar and Footer */}
               <Route element={<UserLayout />}>
@@ -95,9 +100,14 @@ export default function App() {
                 <Route element={<AdminLayout />}>
                   <Route path="/admin" element={<AdminDashboard />} />
                   <Route path="/admin/courses" element={<AdminCourses />} />
+                  <Route path="/admin/courses/new" element={<AdminCourseForm />} />
+                  <Route path="/admin/courses/:id/edit" element={<AdminCourseForm />} />
                   <Route path="/admin/courses/:id" element={<AdminCourseDetails />} />
+                  <Route path="/admin/courses/:courseId/lectures/new" element={<AdminLectureForm />} />
+                  <Route path="/admin/courses/:courseId/lectures/:lectureId" element={<AdminLectureForm />} />
                   <Route path="/admin/lectures" element={<AdminLectures />} />
                   <Route path="/admin/students" element={<AdminStudents />} />
+                  <Route path="/admin/students/:id/profile" element={<AdminStudentProfile />} />
                   <Route path="/admin/enrollments" element={<AdminEnrollments />} />
                   <Route path="/admin/problems" element={<AdminProblems />} />
                   <Route path="/admin/practice-paths" element={<AdminPracticePaths />} />
@@ -108,8 +118,9 @@ export default function App() {
                 </Route>
               </Route>
 
-              </Routes>
-            </ThemeProvider>
+                  </Routes>
+                </BreadcrumbProvider>
+              </ThemeProvider>
             </ToastProvider>
           </NotificationProvider>
         </ProfileProvider>

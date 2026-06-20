@@ -7,6 +7,7 @@ export const getAdminStats = () => axiosInstance.get(`${BASE}/stats`);
 
 // Students
 export const getStudents = () => axiosInstance.get(`${BASE}/students`);
+export const getStudentProfile = (id: string) => axiosInstance.get(`${BASE}/students/${id}/profile`);
 export const deleteStudent = (id: string) => axiosInstance.delete(`${BASE}/students/${id}`);
 
 // Enrollments

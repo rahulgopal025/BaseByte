@@ -23,13 +23,20 @@ const navItems = [
     ]
   },
   {
-    section: "Content",
+    section: "Courses",
     items: [
       { label: "Courses", path: "/admin/courses", icon: BookOpen, color: "text-purple-400" },
-      { label: "Lectures", path: "/admin/lectures", icon: Video, color: "text-violet-400" },
-      { label: "Problems", path: "/admin/problems", icon: Code2, color: "text-emerald-400" },
+    ]
+  },
+  {
+    section: "Practice Path",
+    items: [
       { label: "Practice Paths", path: "/admin/practice-paths", icon: Code2, color: "text-cyan-400" },
-      { label: "Quiz", path: "/admin/quiz", icon: FileQuestion, color: "text-yellow-400" },
+    ]
+  },
+  {
+    section: "Notes",
+    items: [
       { label: "Notes", path: "/admin/notes", icon: FileText, color: "text-pink-400" },
     ]
   },
@@ -60,15 +67,15 @@ export default function AdminSidebar({ onMobileClose }: { onMobileClose?: () => 
 
   return (
     <aside
-      className={`${collapsed ? "w-[72px]" : "w-64"} min-h-screen bg-[#08080A] border-r border-white/5 flex flex-col transition-all duration-300 relative flex-shrink-0`}
+      className={`${collapsed ? "w-[72px]" : "w-64"} h-screen bg-card border-r border-border flex flex-col transition-all duration-300 relative flex-shrink-0`}
     >
       {/* Logo */}
-      <div className={`flex items-center justify-between gap-3 p-5 border-b border-white/5 ${collapsed ? "justify-center" : ""}`}>
+      <div className={`flex items-center justify-between gap-3 p-5 border-b border-border ${collapsed ? "justify-center" : ""}`}>
         <div className="flex items-center gap-3">
           <img src="/logo.png" alt="Logo" className="w-9 h-9 object-contain" />
           {!collapsed && (
             <div>
-              <h1 className="text-white font-black text-base leading-tight">BaseByte</h1>
+              <h1 className="text-foreground font-black text-base leading-tight">BaseByte</h1>
               <p className="text-indigo-400 text-[9px] font-black uppercase tracking-widest">Admin Panel</p>
             </div>
           )}
@@ -83,7 +90,7 @@ export default function AdminSidebar({ onMobileClose }: { onMobileClose?: () => 
       {/* Collapse Toggle */}
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3 top-16 w-6 h-6 bg-[#08080A] border border-white/10 rounded-full flex items-center justify-center text-zinc-500 hover:text-white transition-colors z-10"
+        className="absolute -right-3 top-16 w-6 h-6 bg-card border border-border rounded-full flex items-center justify-center text-zinc-500 hover:text-foreground transition-colors z-10"
       >
         {collapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
       </button>
@@ -106,8 +113,8 @@ export default function AdminSidebar({ onMobileClose }: { onMobileClose?: () => 
                     onClick={() => navigate(item.path)}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group
                       ${active
-                        ? "bg-indigo-600/10 border border-indigo-500/20 text-white"
-                        : "text-zinc-500 hover:text-white hover:bg-white/5 border border-transparent"
+                        ? "bg-indigo-600/10 border border-indigo-500/20 text-indigo-600 dark:text-white"
+                        : "text-zinc-500 hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5 border border-transparent"
                       }
                       ${collapsed ? "justify-center" : ""}
                     `}
@@ -132,16 +139,16 @@ export default function AdminSidebar({ onMobileClose }: { onMobileClose?: () => 
       </nav>
 
       {/* User + Logout */}
-      <div className="p-3 border-t border-white/5">
+      <div className="p-3 border-t border-border">
         {!collapsed && (
-          <div className="flex items-center gap-3 px-3 py-3 mb-2 bg-white/[0.03] rounded-2xl">
+          <div className="flex items-center gap-3 px-3 py-3 mb-2 bg-black/5 dark:bg-white/[0.03] rounded-2xl">
             <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
               <span className="text-white text-xs font-black">
                 {user?.name?.charAt(0).toUpperCase() || "A"}
               </span>
             </div>
             <div className="min-w-0">
-              <p className="text-white text-xs font-black truncate">{user?.name || "Admin"}</p>
+              <p className="text-foreground text-xs font-black truncate">{user?.name || "Admin"}</p>
               <p className="text-zinc-500 text-[10px] truncate">{user?.email}</p>
             </div>
           </div>

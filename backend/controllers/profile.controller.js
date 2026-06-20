@@ -92,15 +92,15 @@ export const saveProfile = asyncHandler(async (req, res) => {
   res.json(new ApiResponse(200, profile, 'Profile saved successfully.'));
 });
 
-// ─── Get Profile with Full Dashboard Data ───────────────────────────────────────
-export const getProfile = asyncHandler(async (req, res) => {
-  let profile = await UserProfile.findOne({ userId: req.user.id });
+// ─── Get Profile Data Service ────────────────────────────────────────────────
+export const getUserProfileData = async (userId, userEmail) => {
+  let profile = await UserProfile.findOne({ userId });
 
-  if (!profile && req.user.email) {
-    profile = await UserProfile.findOne({ email: req.user.email });
+  if (!profile && userEmail) {
+    profile = await UserProfile.findOne({ email: userEmail });
     // Migrate the old profile by setting its userId
     if (profile) {
-      profile.userId = req.user.id;
+      profile.userId = userId;
       await profile.save();
     }
   }
@@ -108,14 +108,12 @@ export const getProfile = asyncHandler(async (req, res) => {
   if (!profile) {
     // Auto-create profile so dashboard is always available
     profile = await UserProfile.create({
-      userId: req.user.id,
-      email: req.user.email || ''
+      userId,
+      email: userEmail || ''
     });
   }
 
-  const userDoc = await User.findById(req.user.id).select('username provider email');
-
-  const userId = req.user.id;
+  const userDoc = await User.findById(userId).select('username provider email name');
 
   // ─── Run all queries in parallel for performance ─────────────────────────
   const [
@@ -429,10 +427,11 @@ export const getProfile = asyncHandler(async (req, res) => {
   };
 
   // ─── Response ────────────────────────────────────────────────────────────
-  res.json(new ApiResponse(200, {
+  return {
     ...profile.toObject(),
     username: userDoc?.username,
     provider: userDoc?.provider,
+    name: userDoc?.name,
     email: userDoc?.email || profile.email,
     stats,
     codingStats,
@@ -443,7 +442,13 @@ export const getProfile = asyncHandler(async (req, res) => {
     profileCompletion,
     completionTips,
     enrolledCourses: enrolledCoursesList,
-  }, 'Profile fetched successfully.'));
+  };
+};
+
+// ─── Get Profile with Full Dashboard Data ───────────────────────────────────────
+export const getProfile = asyncHandler(async (req, res) => {
+  const profileData = await getUserProfileData(req.user.id, req.user.email);
+  res.json(new ApiResponse(200, profileData, 'Profile fetched successfully.'));
 });
 
 // ─── Update Account Settings ──────────────────────────────────────────────────

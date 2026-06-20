@@ -204,11 +204,15 @@ function SectionHeader({ icon, title, accent = '#818cf8' }: { icon: React.ReactN
 // ═══════════════════════════════════════════════════════════════════════════════
 // ─── Main Profile Component ───────────────────────────────────────────────────
 // ═══════════════════════════════════════════════════════════════════════════════
-export default function MyProfile({ setView }: { setView: (v: string) => void }) {
-  const { profileData } = useProfile();
-  const { user } = useAuth();
+export default function MyProfile({ setView, overrideData }: { setView?: (v: string) => void, overrideData?: any }) {
+  const { profileData: ctxProfileData } = useProfile();
+  const { user: ctxUser } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'overview' | 'coding' | 'achievements' | 'settings'>('overview');
+
+  const profileData = overrideData || ctxProfileData;
+  const user = overrideData ? { name: profileData.name || profileData.username, email: profileData.email } : ctxUser;
+  const isReadOnly = !!overrideData;
 
   const codingStats = profileData?.codingStats;
   const learningStats = profileData?.learningStats;
@@ -338,12 +342,14 @@ export default function MyProfile({ setView }: { setView: (v: string) => void })
           </div>
 
           {/* Edit Button */}
-          <button
-            onClick={() => setView("form")}
-            className="shrink-0 group relative px-6 py-3 bg-white/[0.06] hover:bg-indigo-500 text-white rounded-2xl font-bold text-xs uppercase tracking-widest transition-all duration-300 flex items-center gap-2 border border-white/[0.08] hover:border-indigo-500 hover:shadow-lg hover:shadow-indigo-500/20"
-          >
-            {profileData ? <><Edit3 size={16} /> Edit Profile</> : <><PlusCircle size={16} /> Complete Profile</>}
-          </button>
+          {!isReadOnly && (
+            <button
+              onClick={() => setView && setView("form")}
+              className="shrink-0 group relative px-6 py-3 bg-white/[0.06] hover:bg-indigo-500 text-white rounded-2xl font-bold text-xs uppercase tracking-widest transition-all duration-300 flex items-center gap-2 border border-white/[0.08] hover:border-indigo-500 hover:shadow-lg hover:shadow-indigo-500/20"
+            >
+              {profileData ? <><Edit3 size={16} /> Edit Profile</> : <><PlusCircle size={16} /> Complete Profile</>}
+            </button>
+          )}
         </div>
 
         {/* ─── Profile Completion Bar ──────────────────────────────────────── */}
@@ -377,11 +383,15 @@ export default function MyProfile({ setView }: { setView: (v: string) => void })
           <div className="inline-flex p-5 bg-white/[0.04] rounded-2xl mb-5 text-gray-500 group-hover:text-indigo-400 transition-colors">
             <User size={40} />
           </div>
-          <h3 className="text-xl font-bold text-white mb-2">Profile Incomplete</h3>
-          <p className="text-white/30 max-w-sm mx-auto mb-6 text-sm">Complete your profile to unlock achievements, track your learning journey, and build your developer identity.</p>
-          <button onClick={() => setView("form")} className="px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold uppercase text-xs tracking-widest transition-all">
-            Complete Profile Now
-          </button>
+          <h3 className="text-xl font-bold text-white mb-2">{isReadOnly ? "Profile Incomplete" : "Profile Incomplete"}</h3>
+          <p className="text-white/30 max-w-sm mx-auto mb-6 text-sm">
+            {isReadOnly ? "This student has not completed their profile yet." : "Complete your profile to unlock achievements, track your learning journey, and build your developer identity."}
+          </p>
+          {!isReadOnly && (
+            <button onClick={() => setView && setView("form")} className="px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold uppercase text-xs tracking-widest transition-all">
+              Complete Profile Now
+            </button>
+          )}
         </div>
       ) : (
         <>
@@ -393,10 +403,10 @@ export default function MyProfile({ setView }: { setView: (v: string) => void })
               { id: 'overview' as const, label: 'Overview', icon: <BarChart3 size={15} /> },
               { id: 'coding' as const, label: 'Coding Stats', icon: <Code2 size={15} /> },
               { id: 'achievements' as const, label: 'Achievements', icon: <Trophy size={15} /> },
-              { id: 'settings' as const, label: 'Account Settings', icon: <ShieldCheck size={15} /> },
+              ...(!isReadOnly ? [{ id: 'settings' as const, label: 'Account Settings', icon: <ShieldCheck size={15} /> }] : []),
             ].map(tab => (
               <button key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => setActiveTab(tab.id as any)}
                 className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap ${activeTab === tab.id
                   ? 'bg-indigo-500/15 text-indigo-300 border border-indigo-500/20'
                   : 'text-white/30 hover:text-white/50 border border-transparent'

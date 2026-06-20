@@ -7,7 +7,7 @@ export default function AdminLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-[#050505] overflow-hidden w-full text-white font-sans">
+    <div className="flex h-screen bg-background overflow-hidden w-full text-foreground font-sans transition-colors duration-300">
       {/* Mobile Overlay */}
       {mobileMenuOpen && (
         <div 
@@ -24,10 +24,10 @@ export default function AdminLayout() {
         <AdminSidebar onMobileClose={() => setMobileMenuOpen(false)} />
       </div>
 
-      <main className="flex-1 flex flex-col h-screen min-w-0 bg-[#050505] relative">
+      <main className="flex-1 flex flex-col h-screen min-w-0 bg-background relative transition-colors duration-300">
         <AdminHeader onMenuClick={() => setMobileMenuOpen(true)} />
         <div className="flex-1 overflow-y-auto p-4 lg:p-6 lg:pl-0">
-          <div className="bg-[#0a0a0c] min-h-full rounded-[32px] border border-white/5 shadow-2xl relative">
+          <div className="bg-card min-h-full rounded-[32px] border border-border shadow-2xl relative transition-colors duration-300 overflow-hidden">
             <Outlet />
           </div>
         </div>

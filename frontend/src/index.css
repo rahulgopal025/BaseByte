@@ -11,11 +11,13 @@
 @layer base {
   :root {
     /* Light Mode Tokens */
-    --bg-primary: #ffffff;
+    --bg-primary: #f3f4f6; /* gray-100 */
     --text-primary: #111827; /* gray-900 */
-    --bg-card: #f9fafb; /* gray-50 */
+    --bg-card: #ffffff; /* white */
     --border-color: rgba(0, 0, 0, 0.1);
     --text-muted: #6b7280; /* gray-500 */
+    --scrollbar-thumb: rgba(0, 0, 0, 0.2);
+    --scrollbar-hover: rgba(0, 0, 0, 0.3);
   }
   
   .dark {
@@ -25,6 +27,8 @@
     --bg-card: #0A0A0C;
     --border-color: rgba(255, 255, 255, 0.05);
     --text-muted: #9ca3af; /* gray-400 */
+    --scrollbar-thumb: rgba(255, 255, 255, 0.1);
+    --scrollbar-hover: rgba(255, 255, 255, 0.2);
   }
 
   body {
@@ -48,17 +52,17 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--scrollbar-thumb);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--scrollbar-hover);
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */ 

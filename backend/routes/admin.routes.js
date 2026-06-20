@@ -12,6 +12,7 @@ import { verifyAdmin } from '../middleware/admin.middleware.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import ApiResponse from '../utils/ApiResponse.js';
 import ApiError from '../utils/ApiError.js';
+import { getUserProfileData } from '../controllers/profile.controller.js';
 
 const router = express.Router();
 router.use(verifyToken, verifyAdmin);
@@ -67,6 +68,13 @@ router.delete('/students/:id', asyncHandler(async (req, res) => {
   res.json(new ApiResponse(200, null, 'Student deleted.'));
 }));
 
+router.get('/students/:id/profile', asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (!user) throw new ApiError(404, 'User not found.');
+  const profileData = await getUserProfileData(user._id, user.email);
+  res.json(new ApiResponse(200, profileData, 'Student profile fetched.'));
+}));
+
 // ─── ENROLLMENT MANAGEMENT ───────────────────────────────────────
 router.get('/enrollments', asyncHandler(async (req, res) => {
   const enrollments = await Enrollment.find()
@@ -86,8 +94,8 @@ router.get('/enrollments/pending', asyncHandler(async (req, res) => {
 
 router.put('/enrollments/status', asyncHandler(async (req, res) => {
   const { enrollmentId, status } = req.body;
-  if (!['approved', 'rejected'].includes(status)) {
-    throw new ApiError(400, 'Invalid status. Use approved or rejected.');
+  if (!['approved', 'rejected', 'blocked'].includes(status)) {
+    throw new ApiError(400, 'Invalid status. Use approved, rejected, or blocked.');
   }
   const updated = await Enrollment.findByIdAndUpdate(
     enrollmentId,
