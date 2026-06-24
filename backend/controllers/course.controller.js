@@ -49,6 +49,6 @@ export const getCourseProblems = asyncHandler(async (req, res) => {
 });
 
 export const getCourseNotes = asyncHandler(async (req, res) => {
-  const notes = await Notes.find({ course: req.params.id, isApproved: true }).sort({ createdAt: -1 });
+  const notes = await Notes.find({ courses: req.params.id, isApproved: true }).sort({ createdAt: -1 });
   res.json(new ApiResponse(200, notes, 'Course notes fetched.'));
 });

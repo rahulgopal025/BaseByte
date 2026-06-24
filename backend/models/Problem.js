@@ -59,6 +59,12 @@ const problemSchema = new mongoose.Schema({
     }
   ],
 
+  // detailed code solution
+  solution: {
+    type: String,
+    default: ''
+  },
+
   // how many users solved this problem
   solvedCount: {
     type: Number,
@@ -71,3 +77,5 @@ const problemSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 export default mongoose.model('Problem', problemSchema);
+
+

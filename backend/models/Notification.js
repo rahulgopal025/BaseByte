@@ -18,13 +18,18 @@ const NotificationSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
-  userId: {
+  targetUsers: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: function() {
-      return !this.isGlobal;
-    }
-  },
+    ref: 'User'
+  }],
+  targetCourses: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Course'
+  }],
+  targetNotes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Notes'
+  }],
   readBy: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'

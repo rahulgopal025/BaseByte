@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, BookOpen, Save } from "lucide-react";
-import { getAdminCourses, createCourse, updateCourse } from "../../api/admin.api";
+import { ArrowLeft, Save, Upload, X, Loader2 } from "lucide-react";
+import { getAdminCourses, createCourse, updateCourse, uploadImage, getAdminNotes } from "../../api/admin.api";
 
 const emptyForm = {
   title: "", description: "", thumbnail: "", price: 0, originalPrice: 0,
   isFree: false, instructor: "", category: "", tags: "", isPublished: false,
-  discountPercentage: "", level: "", duration: "", lessonsCount: "", isFeatured: false
+  discountPercentage: "", level: "", duration: "", lessonsCount: "", isFeatured: false,
+  courseType: "Recorded", validity: "Lifetime Access", freeNotes: [] as string[]
 };
 
 export default function AdminCourseForm() {
@@ -16,13 +17,44 @@ export default function AdminCourseForm() {
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(!!id);
+  const [isUploading, setIsUploading] = useState(false);
+  const [allNotes, setAllNotes] = useState<any[]>([]);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert("Please select an image file.");
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      alert("File size must be less than 10MB.");
+      return;
+    }
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const res = await uploadImage(formData);
+      setForm({ ...form, thumbnail: res.data.data.url });
+    } catch (err: any) {
+      alert(err.response?.data?.message || "Failed to upload image.");
+    } finally {
+      setIsUploading(false);
+      e.target.value = '';
+    }
+  };
 
   useEffect(() => {
+    getAdminNotes().then(res => setAllNotes(res.data.data || [])).catch(console.error);
     if (id) {
       getAdminCourses().then(res => {
         const found = (res.data.data || []).find((c: any) => c._id === id);
         if (found) {
-          setForm({ ...found, tags: found.tags?.join(", ") || "" });
+          setForm({ ...found, tags: found.tags?.join(", ") || "", freeNotes: found.freeNotes || [] });
         }
       }).catch(console.error).finally(() => setLoading(false));
     }
@@ -78,8 +110,52 @@ export default function AdminCourseForm() {
         </div>
 
         <div>
-          <label className="block text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-2">Thumbnail URL</label>
-          <input placeholder="https://..." value={form.thumbnail} onChange={(e) => setForm({ ...form, thumbnail: e.target.value })} className={inputClass} />
+          <label className="block text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-2">Thumbnail URL or Upload Image</label>
+          <div className="flex flex-col md:flex-row gap-6 items-start">
+            <div className="flex-1 w-full space-y-4">
+              <input placeholder="Or enter image URL directly: https://..." value={form.thumbnail} onChange={(e) => setForm({ ...form, thumbnail: e.target.value })} className={inputClass} />
+              
+              <div className="relative group">
+                <input 
+                  type="file" 
+                  accept="image/png, image/jpeg, image/jpg, image/webp" 
+                  onChange={handleImageUpload}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                  disabled={isUploading}
+                />
+                <div className={`w-full p-8 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center transition-all ${isUploading ? 'bg-black/5 dark:bg-white/5 border-border' : 'bg-black/5 dark:bg-white/[0.02] border-border hover:border-indigo-500 hover:bg-indigo-500/5'}`}>
+                  {isUploading ? (
+                    <div className="flex flex-col items-center gap-3 text-indigo-500">
+                      <Loader2 className="animate-spin" size={32} />
+                      <span className="text-sm font-bold">Uploading to Cloudinary...</span>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-3 text-zinc-500 group-hover:text-indigo-500 transition-colors">
+                      <Upload size={32} />
+                      <div className="text-center">
+                        <p className="text-sm font-bold text-foreground mb-1">Click to upload or drag and drop</p>
+                        <p className="text-xs">PNG, JPG or WEBP (Max 10MB)</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            {form.thumbnail && (
+              <div className="w-full md:w-64 aspect-video shrink-0 rounded-2xl overflow-hidden bg-black/5 border border-border relative group">
+                <img src={form.thumbnail} alt="Thumbnail preview" className="w-full h-full object-cover" />
+                <button 
+                  type="button"
+                  onClick={() => setForm({ ...form, thumbnail: "" })}
+                  className="absolute top-2 right-2 p-2 bg-black/60 hover:bg-rose-500 text-white rounded-lg backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all"
+                  title="Remove Image"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -108,9 +184,54 @@ export default function AdminCourseForm() {
           </div>
         </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-2">Course Type</label>
+            <select value={form.courseType} onChange={(e) => setForm({ ...form, courseType: e.target.value })} className={inputClass}>
+              <option value="Recorded">Recorded</option>
+              <option value="Live + Recorded">Live + Recorded</option>
+              <option value="Live Only">Live Only</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-2">Validity</label>
+            <select value={form.validity} onChange={(e) => setForm({ ...form, validity: e.target.value })} className={inputClass}>
+              <option value="Lifetime Access">Lifetime Access</option>
+              <option value="1 Year Validity">1 Year Validity</option>
+              <option value="6 Months Validity">6 Months Validity</option>
+            </select>
+          </div>
+        </div>
+
         <div>
           <label className="block text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-2">Tags</label>
           <input placeholder="React, Node.js, Typescript (comma separated)" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} className={inputClass} />
+        </div>
+
+        <div>
+          <label className="block text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-2">Free Notes Included</label>
+          <div className="max-h-48 overflow-y-auto bg-black/5 dark:bg-white/[0.03] border border-border rounded-2xl p-4 space-y-2">
+            {allNotes.map(note => (
+              <label key={note._id} className="flex items-center gap-3 cursor-pointer p-1">
+                <input 
+                  type="checkbox" 
+                  checked={form.freeNotes.includes(note._id)}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    setForm(prev => ({
+                      ...prev,
+                      freeNotes: checked 
+                        ? [...prev.freeNotes, note._id]
+                        : prev.freeNotes.filter((id: string) => id !== note._id)
+                    }));
+                  }}
+                  className="w-4 h-4 accent-indigo-500 rounded"
+                />
+                <span className="text-sm font-bold text-foreground">{note.title} <span className="text-xs text-zinc-500 font-normal">({note.subject || "General"})</span></span>
+              </label>
+            ))}
+            {allNotes.length === 0 && <p className="text-xs text-zinc-500">No notes available.</p>}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

@@ -1,27 +1,39 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Play, FileText, Wifi, Lock, Code2, ExternalLink, X, Menu } from "lucide-react";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { ArrowLeft, Play, FileText, Wifi, Lock, Code2, ExternalLink, X, Menu, CheckCircle2, Search, Filter, MessageSquare } from "lucide-react";
 import axiosInstance from "../../api/axios.instance";
 import { getCourseById } from "../../api/course.api";
 import { useToastContext } from "../../context/ToastContext";
+import FeedbackModal from "../../components/FeedbackModal";
 
 export default function CourseLearning() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { showToast } = useToastContext();
 
   const [course, setCourse] = useState<any>(null);
   const [lectures, setLectures] = useState<any[]>([]);
   const [problems, setProblems] = useState<any[]>([]);
   const [notes, setNotes] = useState<any[]>([]);
+  const [submissions, setSubmissions] = useState<any[]>([]);
 
   const [selected, setSelected] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [enrolled, setEnrolled] = useState(false);
 
-  const [activeTab, setActiveTab] = useState<'lectures' | 'practice' | 'notes'>('lectures');
+  const activeTab = (searchParams.get('tab') as 'lectures' | 'practice' | 'notes') || 'lectures';
+  const setActiveTab = (tab: string) => setSearchParams({ tab });
+
   const [selectedProblem, setSelectedProblem] = useState<any>(null);
   const [showSidebar, setShowSidebar] = useState(false);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedDifficulty, setSelectedDifficulty] = useState("All");
+  const [selectedTopic, setSelectedTopic] = useState("All");
+
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [feedbackType, setFeedbackType] = useState<'course' | 'lecture' | 'practice' | 'note'>('course');
 
   const handleSelectLecture = (lecture: any) => {
     setSelected(lecture);
@@ -31,12 +43,13 @@ export default function CourseLearning() {
   useEffect(() => {
     const load = async () => {
       try {
-        const [courseRes, enrollRes, lectureRes, problemRes, notesRes] = await Promise.all([
+        const [courseRes, enrollRes, lectureRes, problemRes, notesRes, submissionsRes] = await Promise.all([
           getCourseById(id!),
           axiosInstance.get(`/api/enrollments/check/${id}`),
           axiosInstance.get(`/api/lectures/${id}`),
           axiosInstance.get(`/api/courses/${id}/problems`).catch(() => ({ data: { data: [] } })),
-          axiosInstance.get(`/api/courses/${id}/notes`).catch(() => ({ data: { data: [] } }))
+          axiosInstance.get(`/api/courses/${id}/notes`).catch(() => ({ data: { data: [] } })),
+          axiosInstance.get(`/api/submissions`).catch(() => ({ data: { data: [] } }))
         ]);
         setCourse(courseRes.data.data);
         const isEnrolled = enrollRes.data.data?.enrolled && enrollRes.data.data?.status === "approved";
@@ -48,6 +61,7 @@ export default function CourseLearning() {
 
         setProblems(problemRes.data.data || []);
         setNotes(notesRes.data.data || []);
+        setSubmissions(submissionsRes.data.data || []);
       } catch {
         showToast("Failed to load course.", "error");
       } finally {
@@ -96,14 +110,14 @@ export default function CourseLearning() {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex items-center px-6 gap-6">
+        <div className="flex items-center px-4 md:px-6 gap-4 md:gap-6 overflow-x-auto hide-scrollbar">
           {(['lectures', 'practice', 'notes'] as const).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`py-3 text-sm font-black uppercase tracking-widest transition-all border-b-2 ${activeTab === tab ? "border-indigo-500 text-indigo-400" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}
+              className={`py-3 text-[10px] md:text-sm font-black uppercase tracking-widest whitespace-nowrap transition-all border-b-2 ${activeTab === tab ? "border-indigo-500 text-indigo-400" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}
             >
-              {tab === 'practice' ? 'Practice Problems' : tab}
+              {tab === 'practice' ? 'Practice' : tab}
             </button>
           ))}
         </div>
@@ -233,18 +247,111 @@ export default function CourseLearning() {
         </div>
       )}
 
-      {activeTab === 'practice' && (
+      {activeTab === 'practice' && (() => {
+        const solvedCount = problems.filter(p => submissions.some(s => s.problemId === p._id && s.status === 'Accepted')).length;
+        const totalCount = problems.length;
+        const progressPercentage = totalCount > 0 ? (solvedCount / totalCount) * 100 : 0;
+
+        const topics = ["All", ...Array.from(new Set(problems.map(p => p.topic).filter(Boolean)))];
+        const difficulties = ["All", "Easy", "Medium", "Hard"];
+
+        const filteredProblems = problems.filter(p => {
+          const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || p.description.toLowerCase().includes(searchQuery.toLowerCase());
+          const matchesDifficulty = selectedDifficulty === "All" || p.difficulty === selectedDifficulty;
+          const matchesTopic = selectedTopic === "All" || p.topic === selectedTopic;
+          return matchesSearch && matchesDifficulty && matchesTopic;
+        });
+
+        return (
         <div className="flex-1 overflow-y-auto p-8 max-w-6xl mx-auto w-full">
+            <div className="relative bg-gradient-to-br from-indigo-900/20 to-fuchsia-900/10 border border-indigo-500/10 rounded-[32px] p-8 mb-10 flex flex-col sm:flex-row items-center justify-between gap-8 shadow-2xl overflow-hidden group">
+              {/* Decorative background blur */}
+              <div className="absolute -top-24 -right-24 w-64 h-64 bg-fuchsia-500/10 blur-[100px] rounded-full pointer-events-none group-hover:bg-fuchsia-500/20 transition-all duration-700"></div>
+              <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-indigo-500/10 blur-[100px] rounded-full pointer-events-none group-hover:bg-indigo-500/20 transition-all duration-700"></div>
+              
+              <div className="relative z-10 flex-1">
+                <h3 className="text-2xl font-black text-white mb-2 tracking-tight">Practice Progress</h3>
+                <p className="text-zinc-400 text-sm">You have conquered <span className="text-white font-bold">{solvedCount}</span> out of <span className="text-white font-bold">{totalCount}</span> challenges.</p>
+              </div>
+              
+              <div className="relative z-10 flex items-center gap-6 w-full sm:w-auto">
+                <div className="flex flex-col items-end flex-1 sm:w-64">
+                  <div className="flex justify-between w-full mb-3">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Completion</span>
+                    <span className="text-xs font-black text-white">{Math.round(progressPercentage)}%</span>
+                  </div>
+                  <div className="w-full bg-black/40 h-4 rounded-full overflow-hidden border border-white/5 shadow-inner">
+                    <div 
+                      className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-fuchsia-500 rounded-full transition-all duration-1000 relative shadow-[0_0_15px_rgba(139,92,246,0.5)]"
+                      style={{ width: `${progressPercentage}%` }}
+                    >
+                      <div className="absolute top-0 right-0 bottom-0 w-8 bg-gradient-to-r from-transparent to-white/30 rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           {problems.length === 0 ? (
             <div className="bg-[#0d0d0e] border border-white/5 rounded-[24px] p-16 text-center">
               <Code2 size={40} className="text-zinc-700 mx-auto mb-4" />
               <p className="text-zinc-500 font-bold">No practice problems available for this course yet.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {problems.map((p) => (
-                <div key={p._id} className="bg-[#0d0d0e] border border-white/5 hover:border-white/10 rounded-[24px] p-6 flex flex-col transition-all">
-                  <div className="flex justify-between items-start mb-4">
+            <>
+              <div className="flex flex-col md:flex-row gap-4 mb-8">
+                <div className="relative flex-1">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
+                  <input
+                    type="text"
+                    placeholder="Search practice problems..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-[#0d0d0e] border border-white/5 focus:border-indigo-500/50 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-zinc-600 outline-none transition-all"
+                  />
+                </div>
+                <div className="flex gap-4">
+                  <div className="relative">
+                    <select
+                      value={selectedTopic}
+                      onChange={(e) => setSelectedTopic(e.target.value)}
+                      className="appearance-none bg-[#0d0d0e] border border-white/5 focus:border-indigo-500/50 rounded-xl py-3 pl-4 pr-10 text-white outline-none transition-all w-full md:w-40 font-bold text-xs uppercase tracking-widest cursor-pointer"
+                    >
+                      {topics.map(t => <option key={t as string} value={t as string}>{t as string}</option>)}
+                    </select>
+                    <Filter className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" size={14} />
+                  </div>
+                  <div className="relative">
+                    <select
+                      value={selectedDifficulty}
+                      onChange={(e) => setSelectedDifficulty(e.target.value)}
+                      className="appearance-none bg-[#0d0d0e] border border-white/5 focus:border-indigo-500/50 rounded-xl py-3 pl-4 pr-10 text-white outline-none transition-all w-full md:w-40 font-bold text-xs uppercase tracking-widest cursor-pointer"
+                    >
+                      {difficulties.map(d => <option key={d} value={d}>{d}</option>)}
+                    </select>
+                    <Filter className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" size={14} />
+                  </div>
+                </div>
+              </div>
+
+              {filteredProblems.length === 0 ? (
+                <div className="bg-[#0d0d0e] border border-white/5 rounded-[24px] p-16 text-center">
+                  <Search size={40} className="text-zinc-700 mx-auto mb-4" />
+                  <p className="text-zinc-500 font-bold">No practice problems match your search criteria.</p>
+                  <button onClick={() => { setSearchQuery(""); setSelectedDifficulty("All"); setSelectedTopic("All"); }} className="mt-4 text-indigo-400 hover:text-indigo-300 font-bold text-sm transition-colors">Clear Filters</button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {filteredProblems.map((p) => {
+                const isSolved = submissions.some(s => s.problemId === p._id && s.status === 'Accepted');
+                return (
+                <div key={p._id} className="bg-[#0d0d0e] border border-white/5 hover:border-indigo-500/30 rounded-[24px] p-6 flex flex-col transition-all duration-300 relative hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-500/10 group">
+                  {isSolved && (
+                    <div className="absolute top-4 right-4 text-emerald-400 bg-emerald-500/10 p-1.5 rounded-full border border-emerald-500/20">
+                      <CheckCircle2 size={16} />
+                    </div>
+                  )}
+                  <div className="flex justify-between items-start mb-4 pr-10">
                     <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full border ${difficultyColor(p.difficulty)}`}>
                       {p.difficulty}
                     </span>
@@ -265,16 +372,18 @@ export default function CourseLearning() {
 
                   <button
                     onClick={() => setSelectedProblem(p)}
-                    className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-black uppercase text-xs tracking-widest transition-all active:scale-95 text-center"
+                    className={`w-full py-3 rounded-xl font-black uppercase text-xs tracking-widest transition-all active:scale-95 text-center ${isSolved ? 'bg-emerald-600/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-600/20' : 'bg-indigo-600 hover:bg-indigo-500'}`}
                   >
-                    Solve Problem
+                    {isSolved ? "Solve Again" : "Solve Problem"}
                   </button>
                 </div>
-              ))}
+              )})}
             </div>
+            )}
+            </>
           )}
         </div>
-      )}
+      )})()}
 
       {activeTab === 'notes' && (
         <div className="flex-1 overflow-y-auto p-8 max-w-6xl mx-auto w-full">
@@ -284,26 +393,68 @@ export default function CourseLearning() {
               <p className="text-zinc-500 font-bold">No notes available for this course yet.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {notes.map((note) => (
-                <div key={note._id} className="bg-[#0d0d0e] border border-white/5 hover:border-white/10 rounded-[24px] p-6 flex items-center justify-between transition-all">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center flex-shrink-0">
-                      <FileText size={20} className="text-pink-400" />
-                    </div>
-                    <div>
-                      <h3 className="font-black mb-1">{note.title}</h3>
-                      <p className="text-zinc-500 text-xs">{note.subject || "Course Material"}</p>
+                <div
+                  key={note._id}
+                  onClick={() => navigate(`/notes/${note._id}/view`)}
+                  className="group relative bg-[#0d0d0e]/80 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden hover:-translate-y-2 hover:scale-[1.01] transition-all duration-500 cursor-pointer hover:shadow-[0_20px_40px_-15px_rgba(99,102,241,0.2)] hover:border-indigo-500/50 flex flex-col h-[400px]"
+                >
+                  {/* Thumbnail Header Area */}
+                  <div className="h-[180px] relative overflow-hidden flex-shrink-0 bg-gradient-to-br from-indigo-900/40 to-fuchsia-900/40 border-b border-white/10 flex items-center justify-center">
+                    {note.thumbnailUrl ? (
+                      <img src={note.thumbnailUrl} alt={note.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                    ) : (
+                      <>
+                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-fuchsia-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        <FileText size={56} className="text-indigo-400/40 group-hover:text-indigo-400 transition-all duration-500 relative z-10" />
+                      </>
+                    )}
+                    {/* Floating Badges inside thumbnail area */}
+                    <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
+                      <span className="px-3 py-1 bg-black/50 backdrop-blur-md border border-white/10 text-white text-[10px] font-black uppercase tracking-wider rounded-full shadow-lg">
+                        {note.subject || "Course Material"}
+                      </span>
+                      <span className="px-3 py-1 bg-emerald-500/80 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-wider rounded-full shadow-lg">
+                        Included
+                      </span>
                     </div>
                   </div>
-                  <a
-                    href={note.fileUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="px-5 py-2.5 bg-white/5 hover:bg-white/10 rounded-xl font-black uppercase text-[10px] tracking-widest text-zinc-300 transition-all flex items-center gap-2"
-                  >
-                    View <ExternalLink size={12} />
-                  </a>
+
+                  {/* Content */}
+                  <div className="p-6 flex flex-col flex-1 relative z-10">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-colors duration-500 pointer-events-none" />
+
+                    <h3 className="font-bold text-xl md:text-2xl tracking-tight leading-snug text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-fuchsia-400 transition-all line-clamp-2 drop-shadow-md mb-2">
+                      {note.title}
+                    </h3>
+
+                    <div className="flex flex-col gap-1.5 text-zinc-400 text-sm font-medium mb-auto mt-1">
+                      <div className="flex items-center gap-2">
+                        <FileText size={16} className="text-indigo-400/70" /> 
+                        <span>{note.totalPages > 0 ? `${note.totalPages} Pages` : "Full Access"}</span>
+                      </div>
+                      <div className="text-[11px] font-bold text-zinc-500 bg-white/5 w-max px-2 py-1 rounded-md border border-white/5 flex items-center gap-1.5">
+                        <div className={`w-1.5 h-1.5 rounded-full ${note.isFree ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]' : 'bg-fuchsia-400 shadow-[0_0_8px_rgba(232,121,249,0.5)]'}`} />
+                        {note.isFree ? "Preview: Full Access" : `Preview: Pages ${note.previewStartPage || 1}-${note.previewEndPage || 5}`}
+                      </div>
+                    </div>
+
+                    {/* Footer */}
+                    <div className="mt-4 pt-4 border-t border-white/10 flex items-center justify-between">
+                      <div className="flex items-end gap-2">
+                        {note.price > 0 && (
+                          <div className="flex flex-col">
+                            <span className="text-xs font-bold text-zinc-500 line-through">₹{note.price}</span>
+                            <span className="text-xl font-black text-emerald-400 leading-none tracking-tight">Free</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="h-10 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-all duration-300 text-sm shadow-[0_0_20px_rgba(79,70,229,0.3)] active:scale-95 group/btn">
+                        Read Now <span className="group-hover/btn:translate-x-1 transition-transform">→</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -345,10 +496,8 @@ export default function CourseLearning() {
                   CodeChef
                 </a>
               )}
-
-              {/* Fallback to BaseByte Internal Compiler */}
               {!selectedProblem.leetCodeUrl && !selectedProblem.gfgUrl && !selectedProblem.hackerRankUrl && !selectedProblem.codeChefUrl && (
-                <button onClick={() => navigate(`/practice/${selectedProblem._id}`)} className="block w-full p-4 border border-indigo-500/20 bg-indigo-500/10 text-indigo-400 rounded-2xl hover:bg-indigo-500/20 transition-all text-center font-bold">
+                <button onClick={() => navigate(`/solve/${selectedProblem._id}`)} className="block w-full p-4 border border-indigo-500/20 bg-indigo-500/10 text-indigo-400 rounded-2xl hover:bg-indigo-500/20 transition-all text-center font-bold">
                   BaseByte IDE
                 </button>
               )}
@@ -356,6 +505,24 @@ export default function CourseLearning() {
           </div>
         </div>
       )}
+
+      {/* Floating Feedback Button */}
+      <button
+        onClick={() => {
+          setFeedbackType(activeTab === 'practice' ? 'practice' : activeTab === 'notes' ? 'note' : 'lecture');
+          setShowFeedbackModal(true);
+        }}
+        className="fixed bottom-8 right-8 z-40 bg-white hover:bg-zinc-200 text-black p-4 rounded-full shadow-2xl hover:scale-110 transition-transform flex items-center justify-center group"
+      >
+        <MessageSquare size={24} className="group-hover:-rotate-12 transition-transform" />
+      </button>
+
+      <FeedbackModal 
+        isOpen={showFeedbackModal} 
+        onClose={() => setShowFeedbackModal(false)} 
+        type={feedbackType} 
+        courseId={id} 
+      />
     </div>
   );
 }

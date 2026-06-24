@@ -1,23 +1,18 @@
 import { useEffect, useState } from "react";
-import { FileText, Plus, Trash2, Check, X } from "lucide-react";
-import { getAdminNotes, uploadAdminNotes, approveNotes, deleteNotes } from "../../api/admin.api";
-import { getAllCourses } from "../../api/course.api";
-
-const emptyForm = { title: "", fileUrl: "", subject: "", price: 0, isFree: true, course: "" };
+import { FileText, Plus, Check, Download, Search } from "lucide-react";
+import { getAdminNotes, approveNotes } from "../../api/admin.api";
+import { useNavigate } from "react-router-dom";
 
 export default function AdminNotes() {
   const [notes, setNotes] = useState<any[]>([]);
-  const [courses, setCourses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState(emptyForm);
-  const [saving, setSaving] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
   const load = () => {
-    Promise.all([getAdminNotes(), getAllCourses()])
-      .then(([notesRes, courseRes]) => {
+    getAdminNotes()
+      .then((notesRes) => {
         setNotes(notesRes.data.data || []);
-        setCourses(courseRes.data.data || []);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -25,27 +20,12 @@ export default function AdminNotes() {
 
   useEffect(() => { load(); }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); setSaving(true);
-    const payload: any = { ...form };
-    if (payload.course === "") delete payload.course;
-    try { await uploadAdminNotes(payload); setShowForm(false); setForm(emptyForm); load(); }
-    catch { alert("Failed to upload."); }
-    finally { setSaving(false); }
-  };
-
   const handleApprove = async (id: string) => {
     await approveNotes(id);
     setNotes((prev) => prev.map((n) => n._id === id ? { ...n, isApproved: true } : n));
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete these notes?")) return;
-    await deleteNotes(id);
-    setNotes((prev) => prev.filter((n) => n._id !== id));
-  };
 
-  const inputClass = "w-full px-4 py-3 bg-white/[0.03] border border-white/5 rounded-2xl text-white text-sm outline-none focus:border-indigo-500 transition-all placeholder:text-zinc-600";
 
   return (
     <div className="p-8 text-white">
@@ -60,45 +40,21 @@ export default function AdminNotes() {
           <h1 className="text-4xl font-black tracking-tighter mb-1">Notes</h1>
           <p className="text-zinc-500 font-medium">{notes.length} total notes</p>
         </div>
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-black uppercase text-xs tracking-widest transition-all active:scale-95 shadow-lg shadow-indigo-600/20">
+        <button onClick={() => navigate('/admin/notes/create')} className="flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-black uppercase text-xs tracking-widest transition-all active:scale-95 shadow-lg shadow-indigo-600/20">
           <Plus size={16} /> Upload Notes
         </button>
       </div>
 
-      {showForm && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0d0d0e] border border-white/10 rounded-[32px] p-8 w-full max-w-md">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-black">Upload Notes</h2>
-              <button onClick={() => setShowForm(false)} className="text-zinc-500 hover:text-white"><X size={20} /></button>
-            </div>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input required placeholder="Notes Title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className={inputClass} />
-              <input required placeholder="File URL (Google Drive / Cloudinary)" value={form.fileUrl} onChange={(e) => setForm({ ...form, fileUrl: e.target.value })} className={inputClass} />
-              <div className="grid grid-cols-2 gap-4">
-                <input placeholder="Subject" value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} className={inputClass} />
-                <select value={form.course} onChange={(e) => setForm({ ...form, course: e.target.value })} className={inputClass + " cursor-pointer"}>
-                  <option value="" className="bg-[#0d0d0e] text-white">Select Course (Optional)</option>
-                  {courses.map(c => <option key={c._id} value={c._id} className="bg-[#0d0d0e] text-white">{c.title}</option>)}
-                </select>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <input type="number" placeholder="Price (₹)" value={form.price} onChange={(e) => setForm({ ...form, price: Number(e.target.value) })} className={inputClass} />
-                <div className="flex items-center gap-3 px-4 py-3 bg-white/[0.03] border border-white/5 rounded-2xl">
-                  <input type="checkbox" id="notesFree" checked={form.isFree} onChange={(e) => setForm({ ...form, isFree: e.target.checked })} className="w-4 h-4 accent-indigo-500" />
-                  <label htmlFor="notesFree" className="text-sm text-zinc-400 font-bold">Free</label>
-                </div>
-              </div>
-              <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => setShowForm(false)} className="flex-1 py-3 bg-white/5 rounded-2xl font-black uppercase text-xs tracking-widest text-zinc-400">Cancel</button>
-                <button type="submit" disabled={saving} className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-2xl font-black uppercase text-xs tracking-widest text-white disabled:opacity-60">
-                  {saving ? "Uploading..." : "Upload"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <div className="relative mb-8 max-w-md">
+        <input 
+          type="text" 
+          placeholder="Search notes by title or subject..." 
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-12 pr-4 py-3 bg-card border border-border rounded-xl text-sm outline-none focus:border-indigo-500 transition-all placeholder:text-zinc-500 shadow-sm"
+        />
+        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" />
+      </div>
 
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -110,27 +66,48 @@ export default function AdminNotes() {
           <p className="text-zinc-500 font-bold">No notes uploaded yet.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {notes.map((note) => (
-            <div key={note._id} className="bg-[#0d0d0e] border border-white/5 rounded-[24px] p-6 hover:border-white/10 transition-all">
-              <div className="flex items-start justify-between mb-4">
-                <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full border ${note.isApproved ? "bg-green-500/10 text-green-400 border-green-500/20" : "bg-orange-500/10 text-orange-400 border-orange-500/20"}`}>
-                  {note.isApproved ? "Approved" : "Pending"}
-                </span>
-                <span className="text-indigo-400 font-black">{note.isFree ? "Free" : `₹${note.price}`}</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {notes.filter(note => 
+            note.title?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+            note.subject?.toLowerCase().includes(searchQuery.toLowerCase())
+          ).map((note) => (
+            <div 
+              key={note._id} 
+              onClick={() => navigate(`/admin/notes/${note._id}`)}
+              className="group cursor-pointer bg-card border border-border rounded-[24px] p-6 hover:border-indigo-500/50 hover:shadow-[0_0_30px_rgba(79,70,229,0.15)] transition-all flex flex-col justify-between min-h-[260px]"
+            >
+              <div>
+                <div className="flex items-start justify-between mb-4">
+                  <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full border ${note.isApproved ? "bg-green-500/10 text-green-500 border-green-500/20" : "bg-orange-500/10 text-orange-500 border-orange-500/20"}`}>
+                    {note.isApproved ? "Approved" : "Pending"}
+                  </span>
+                  <span className="text-indigo-400 font-black flex items-center gap-1 text-sm bg-indigo-500/10 px-3 py-1 rounded-full">
+                    {note.isFree ? "Free" : <>₹{note.price}</>}
+                  </span>
+                </div>
+                
+                <h3 className="font-black text-lg mb-1 text-foreground group-hover:text-indigo-400 transition-colors line-clamp-2">{note.title}</h3>
+                <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest mb-3">{note.subject || "General"}</p>
               </div>
-              <h3 className="font-black mb-1">{note.title}</h3>
-              <p className="text-zinc-500 text-sm mb-1">{note.subject}</p>
-              <p className="text-zinc-600 text-xs mb-6">{note.uploaderEmail}</p>
-              <div className="flex gap-2">
-                {!note.isApproved && (
-                  <button onClick={() => handleApprove(note._id)} className="flex-1 flex items-center justify-center gap-1 py-2.5 bg-green-500/10 hover:bg-green-500/20 text-green-400 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all">
-                    <Check size={12} /> Approve
+
+              {!note.isApproved ? (
+                <div className="pt-4 border-t border-border flex justify-end">
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); handleApprove(note._id); }} 
+                    className="flex items-center gap-1.5 px-4 py-2 bg-green-500/10 hover:bg-green-500/20 text-green-500 rounded-lg font-black uppercase text-[10px] tracking-widest transition-all"
+                  >
+                    <Check size={12} /> Approve Now
                   </button>
-                )}
-                <a href={note.fileUrl} target="_blank" rel="noreferrer" className="flex-1 flex items-center justify-center py-2.5 bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white rounded-xl font-black uppercase text-[10px] tracking-widest transition-all">View</a>
-                <button onClick={() => handleDelete(note._id)} className="p-2.5 text-zinc-600 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all"><Trash2 size={14} /></button>
-              </div>
+                </div>
+              ) : (
+                <div className="pt-4 border-t border-border flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-zinc-500 text-[10px] font-black uppercase tracking-widest">
+                    <span className="flex items-center gap-1"><Download size={14} className="text-pink-400" /> {note.downloads || 0} DLs</span>
+                    <span className="flex items-center gap-1"><FileText size={14} className="text-indigo-400" /> {note.totalPages > 0 ? note.totalPages : "N/A"} PGs</span>
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400 group-hover:underline">Manage →</span>
+                </div>
+              )}
             </div>
           ))}
         </div>

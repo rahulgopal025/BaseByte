@@ -40,7 +40,13 @@ export default function AdminHeader({ onMenuClick }: { onMenuClick: () => void }
         <Menu size={20} />
       </button>
 
-
+      {/* Mobile Logo */}
+      <div className="md:hidden flex items-center gap-2 cursor-pointer" onClick={() => navigate("/admin")}>
+        <img src="/logo.png" alt="Logo" className="w-6 h-6 object-contain" />
+        <h1 className="text-lg font-black bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent tracking-tight leading-none">
+          BaseByte
+        </h1>
+      </div>
 
       <div className="flex items-center gap-2 text-sm font-bold text-zinc-500">
         {pathParts.map((part, i) => {

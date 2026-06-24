@@ -15,8 +15,8 @@ const feedbackSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['course', 'website'],
-    default: 'website'
+    enum: ['course', 'website', 'lecture', 'practice', 'note', 'quiz', 'general'],
+    default: 'general'
   },
   rating: {
     type: Number,

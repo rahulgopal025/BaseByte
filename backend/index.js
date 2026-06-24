@@ -18,6 +18,7 @@ import problemRoutes from './routes/problem.routes.js';
 import quizRoutes from './routes/quiz.routes.js';
 import profileRoutes from './routes/profile.routes.js';
 import adminRoutes from './routes/admin.routes.js';
+import analyticsRoutes from './routes/analytics.routes.js';
 import courseRoutes from './routes/course.routes.js';
 import lectureRoutes from './routes/lecture.routes.js';
 import enrollmentRoutes from './routes/enrollment.routes.js';
@@ -28,6 +29,7 @@ import submissionRoutes from './routes/submission.routes.js';
 import practiceRoutes from './routes/practice.routes.js';
 import notificationRoutes from './routes/notification.routes.js';
 import contactRoutes from './routes/contact.routes.js';
+import uploadRoutes from './routes/upload.routes.js';
 
 
 const app = express();
@@ -78,6 +80,7 @@ app.use('/api/problems', problemRoutes);
 app.use('/api/quizzes', quizRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/analytics', analyticsRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/lectures', lectureRoutes);
 app.use('/api/enrollments', enrollmentRoutes);
@@ -88,6 +91,7 @@ app.use('/api/submissions', submissionRoutes);
 app.use('/api/practice', practiceRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/upload', uploadRoutes);
 
 
 // 404 Handler
@@ -108,3 +112,5 @@ connectDB().then(() => {
     console.log(`🔗 Frontend: ${process.env.FRONTEND_URL}`);
   });
 });
+// trigger restart
+// trigger restart 2

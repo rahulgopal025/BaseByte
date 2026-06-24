@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getProblemById } from "../../api/problem.api";
 import type { Problem } from "../../types/problem.types";
-import { ChevronLeft, Info, Terminal, Play, RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
+import { ChevronLeft, Info, Terminal, Play, RotateCcw, ZoomIn, ZoomOut, Eye, EyeOff, Maximize, Minimize, Copy, Check, CheckCircle2, MessageSquare } from "lucide-react";
 import LanguageSelector from "../../components/Compiler/LanguageSelector";
+import FeedbackModal from "../../components/FeedbackModal";
 import CodeEditor from "../../components/Compiler/CodeEditor";
 import Console from "../../components/Compiler/Console";
 import axiosInstance from "../../api/axios.instance";
@@ -28,6 +29,10 @@ export default function ProblemSolve() {
   const [errorLine, setErrorLine] = useState<number | null>(null);
   const [input, setInput] = useState(""); 
   const [submitting, setSubmitting] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [leftTab, setLeftTab] = useState<"description" | "solution">("description");
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const fetchProblem = async () => {
@@ -85,7 +90,7 @@ export default function ProblemSolve() {
         setOutput(`[${statusDescription}]\n\n${errorDetails}`);
       } else {
         const outNorm = stdout.trim();
-        const expNorm = problem?.sampleOutput?.trim() || "";
+        const expNorm = problem?.sampleOutput?.replace(/\\n/g, '\n').trim() || "";
         
         if (!expNorm || outNorm === expNorm) {
           setOutput(`[${statusDescription}]\n\n${stdout}`);
@@ -150,33 +155,70 @@ export default function ProblemSolve() {
 
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         
-        <div className="w-full lg:w-1/3 h-1/3 lg:h-auto border-b lg:border-b-0 lg:border-r border-white/5 flex flex-col bg-[#0d0d0e] shrink-0">
-          <div className="flex items-center gap-2 p-4 border-b border-white/5 bg-white/[0.02]">
-            <Info size={14} className="text-indigo-400" />
-            <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Description</span>
+        <div className={`w-full lg:w-1/3 h-1/3 lg:h-auto border-b lg:border-b-0 lg:border-r border-white/5 flex flex-col bg-[#0d0d0e] shrink-0 transition-all duration-300 ${isFullscreen ? "hidden" : ""}`}>
+          <div className="flex items-center p-0 border-b border-white/5 bg-white/[0.02] overflow-x-auto hide-scrollbar shrink-0">
+            <button 
+              onClick={() => setLeftTab("description")}
+              className={`flex items-center gap-2 px-6 py-4 text-[10px] font-black uppercase tracking-widest transition-all border-b-2 ${leftTab === "description" ? "border-indigo-500 text-indigo-400 bg-white/5" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}
+            >
+              <Info size={14} /> Description
+            </button>
+            {problem?.solution && (
+              <button 
+                onClick={() => setLeftTab("solution")}
+                className={`flex items-center gap-2 px-6 py-4 text-[10px] font-black uppercase tracking-widest transition-all border-b-2 ${leftTab === "solution" ? "border-indigo-500 text-indigo-400 bg-white/5" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}
+              >
+                <CheckCircle2 size={14} /> Solution
+              </button>
+            )}
           </div>
           
           <div className="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
-            <h1 className="text-2xl font-black text-white mb-6 leading-tight">{problem?.title}</h1>
-            <div className="prose prose-invert max-w-none">
-              <p className="text-zinc-400 leading-relaxed text-sm mb-8">{problem?.description}</p>
-              
-              <div className="space-y-6">
-                <div className="bg-black/40 border border-white/5 rounded-2xl p-5">
-                  <h4 className="text-[10px] font-black text-zinc-500 uppercase mb-3 tracking-widest flex items-center gap-2">
-                    <Terminal size={12} /> Expected Input
-                  </h4>
-                  <pre className="text-indigo-400 font-mono text-xs">{problem?.sampleInput || "No specific input required."}</pre>
-                </div>
+            {leftTab === "description" ? (
+              <>
+                <h1 className="text-2xl font-black text-white mb-6 leading-tight">{problem?.title}</h1>
+                <div className="prose prose-invert max-w-none">
+                  <p className="text-zinc-400 leading-relaxed text-sm mb-8">{problem?.description}</p>
+                  
+                  <div className="space-y-6">
+                    <div className="bg-black/40 border border-white/5 rounded-2xl p-5">
+                      <h4 className="text-[10px] font-black text-zinc-500 uppercase mb-3 tracking-widest flex items-center gap-2">
+                        <Terminal size={12} /> Expected Input
+                      </h4>
+                      <pre className="text-indigo-400 font-mono text-xs">{problem?.sampleInput?.replace(/\\n/g, '\n') || "No specific input required."}</pre>
+                    </div>
 
-                <div className="bg-black/40 border border-white/5 rounded-2xl p-5">
-                  <h4 className="text-[10px] font-black text-zinc-500 uppercase mb-3 tracking-widest flex items-center gap-2">
-                    <Terminal size={12} /> Expected Output
-                  </h4>
-                  <pre className="text-emerald-400 font-mono text-xs">{problem?.sampleOutput}</pre>
+                    <div className="bg-black/40 border border-white/5 rounded-2xl p-5">
+                      <h4 className="text-[10px] font-black text-zinc-500 uppercase mb-3 tracking-widest flex items-center gap-2">
+                        <Terminal size={12} /> Expected Output
+                      </h4>
+                      <pre className="text-emerald-400 font-mono text-xs">{problem?.sampleOutput?.replace(/\\n/g, '\n')}</pre>
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <h1 className="text-xl font-black text-white">Solution Code</h1>
+                  <button 
+                    onClick={() => {
+                      navigator.clipboard.writeText(problem?.solution || "");
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                      showToast("Solution copied to clipboard!", "success");
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-bold transition-all active:scale-95"
+                  >
+                    {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                    {copied ? "Copied!" : "Copy"}
+                  </button>
+                </div>
+                <div className="bg-black/40 border border-white/5 rounded-2xl p-5 overflow-x-auto custom-scrollbar">
+                  <pre className="text-white/80 font-mono text-xs whitespace-pre-wrap">{problem?.solution?.replace(/\\n/g, '\n')}</pre>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 
@@ -198,6 +240,14 @@ export default function ProblemSolve() {
                   <button onClick={() => setFontSize(Math.max(12, fontSize - 2))} className="p-1 text-zinc-400 hover:text-white transition-colors"><ZoomOut size={14}/></button>
                   <button onClick={() => setFontSize(Math.min(24, fontSize + 2))} className="p-1 text-zinc-400 hover:text-white transition-colors"><ZoomIn size={14}/></button>
                 </div>
+                <div className="h-4 w-[1px] bg-white/10 hidden sm:block"></div>
+                <button 
+                  onClick={() => setIsFullscreen(!isFullscreen)} 
+                  className="p-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-zinc-400 hover:text-white transition-colors hidden lg:flex items-center justify-center"
+                  title={isFullscreen ? "Exit Fullscreen" : "Fullscreen Editor"}
+                >
+                  {isFullscreen ? <Minimize size={14} /> : <Maximize size={14} />}
+                </button>
               </div>
 
               <div className="flex items-center gap-2">
@@ -247,6 +297,22 @@ export default function ProblemSolve() {
         </div>
         
       </div>
+
+      {/* Floating Feedback Button */}
+      <button
+        onClick={() => setShowFeedbackModal(true)}
+        className="fixed bottom-8 right-8 z-40 bg-white hover:bg-zinc-200 text-black p-4 rounded-full shadow-2xl hover:scale-110 transition-transform flex items-center justify-center group"
+      >
+        <MessageSquare size={24} className="group-hover:-rotate-12 transition-transform" />
+      </button>
+
+      <FeedbackModal 
+        isOpen={showFeedbackModal} 
+        onClose={() => setShowFeedbackModal(false)} 
+        type="quiz" 
+        courseId={problem?.course as any} 
+      />
     </div>
   );
 }
+

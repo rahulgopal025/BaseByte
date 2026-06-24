@@ -12,6 +12,7 @@ export interface Problem {
   tags: string[];
   sampleInput: string;
   sampleOutput: string;
+  solution?: string;
   testCases: TestCase[];
   createdAt: string;
 }

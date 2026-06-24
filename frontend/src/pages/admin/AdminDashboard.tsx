@@ -15,6 +15,7 @@ interface Stats {
   totalQuizzes: number;
   totalFeedback: number;
   totalNotes: number;
+  totalPracticePaths: number;
   pendingEnrollments: number;
   recentStudents: { _id: string; name: string; email: string; createdAt: string }[];
 }
@@ -40,7 +41,7 @@ export default function AdminDashboard() {
     { label: "Total Courses", value: stats.totalCourses, icon: BookOpen, color: "text-purple-400", bg: "bg-purple-500/10 border-purple-500/20", path: "/admin/courses" },
     { label: "Total Problems", value: stats.totalProblems, icon: BarChart3, color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20", path: "/admin/problems" },
     { label: "Total Quizzes", value: stats.totalQuizzes, icon: FileQuestion, color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/20", path: "/admin/quiz" },
-    { label: "Practice Paths", value: "Manage", icon: BarChart3, color: "text-cyan-400", bg: "bg-cyan-500/10 border-cyan-500/20", path: "/admin/practice-paths" },
+    { label: "Practice Paths", value: stats.totalPracticePaths, icon: BarChart3, color: "text-cyan-400", bg: "bg-cyan-500/10 border-cyan-500/20", path: "/admin/practice-paths" },
     { label: "Feedback", value: stats.totalFeedback, icon: MessageSquare, color: "text-rose-400", bg: "bg-rose-500/10 border-rose-500/20", path: "/admin/feedback" },
     { label: "Approved Notes", value: stats.totalNotes, icon: FileText, color: "text-pink-400", bg: "bg-pink-500/10 border-pink-500/20", path: "/admin/notes" },
   ] : [];
@@ -49,8 +50,8 @@ export default function AdminDashboard() {
     <div className="p-8 text-foreground">
       {/* Header */}
       <div className="flex items-center gap-3 mb-2">
-        <div className="p-2 bg-indigo-600/10 border border-indigo-500/20 rounded-xl">
-          <Zap size={18} className="text-indigo-400" fill="currentColor" />
+        <div className="p-1.5 bg-indigo-600/10 border border-indigo-500/20 rounded-xl">
+          <img src="/logo.png" alt="BaseByte" className="w-5 h-5 object-contain drop-shadow-md" />
         </div>
         <span className="text-indigo-400 text-xs font-black uppercase tracking-widest">Overview</span>
       </div>

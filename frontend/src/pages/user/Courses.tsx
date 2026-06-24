@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BookOpen, Search, Star, Users, Zap, IndianRupee } from "lucide-react";
+import { BookOpen, Search, Star, Users, Zap, IndianRupee, Video, Radio, Infinity, CalendarClock } from "lucide-react";
 import { getAllCourses } from "../../api/course.api";
 
 export default function Courses() {
@@ -74,7 +74,7 @@ export default function Courses() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[1, 2, 3, 4, 5, 6].map(i => (
-              <div key={i} className="h-96 bg-white/5 rounded-[2rem] animate-pulse border border-white/5 backdrop-blur-sm" />
+              <div key={i} className="h-[340px] bg-white/5 rounded-[2rem] animate-pulse border border-white/5 backdrop-blur-sm" />
             ))}
           </div>
         ) : filtered.length === 0 ? (
@@ -96,7 +96,7 @@ export default function Courses() {
               className="group relative bg-white/[0.02] border border-white/5 rounded-3xl overflow-hidden hover:-translate-y-2 transition-all duration-500 cursor-pointer hover:shadow-[0_0_40px_rgba(79,70,229,0.15)] hover:border-indigo-500/30 flex flex-col backdrop-blur-sm"
             >
               {/* Thumbnail */}
-              <div className="h-[220px] relative overflow-hidden flex-shrink-0 bg-gradient-to-br from-indigo-500/10 to-fuchsia-500/10 border-b border-white/5">
+              <div className="h-[180px] relative overflow-hidden flex-shrink-0 bg-gradient-to-br from-indigo-500/10 to-fuchsia-500/10 border-b border-white/5">
                 {course.thumbnail ? (
                   <img
                     src={course.thumbnail}
@@ -131,22 +131,22 @@ export default function Courses() {
               </div>
 
               {/* Content */}
-              <div className="p-6 md:p-8 flex flex-col flex-1 relative z-10 -mt-10">
+              <div className="p-5 flex flex-col flex-1 relative z-10">
                 {/* Subtle gradient orb behind text */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-colors duration-500 pointer-events-none" />
 
-                <div className="mb-3">
-                  <h3 className="font-bold text-2xl md:text-3xl tracking-tight leading-snug text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-fuchsia-400 transition-all line-clamp-2 drop-shadow-sm">
+                <div className="mb-2">
+                  <h3 className="font-bold text-xl md:text-xl tracking-tight leading-snug text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-fuchsia-400 transition-all line-clamp-2 drop-shadow-md">
                     {course.title}
                   </h3>
                 </div>
 
-                <p className="text-zinc-400 text-[15px] leading-relaxed mb-6 line-clamp-2">
+                <p className="text-zinc-400 text-sm leading-relaxed mb-4 line-clamp-2">
                   {course.description}
                 </p>
 
                 {/* Grid details */}
-                <div className="grid grid-cols-2 gap-y-3 gap-x-2 mb-8">
+                <div className="grid grid-cols-2 gap-y-2 gap-x-2 mb-5">
                   {course.instructor && (
                     <div className="flex items-center gap-2.5 text-zinc-300 text-[13px] col-span-2 mb-2">
                       <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-fuchsia-500 flex items-center justify-center text-xs font-bold text-white shadow-inner ring-2 ring-white/10">
@@ -173,27 +173,47 @@ export default function Courses() {
                       <span className="truncate">{course.lessonsCount} lessons</span>
                     </div>
                   )}
+                  {course.courseType && (
+                    <div className="flex items-center gap-2 text-zinc-400 text-[13px] bg-white/5 px-3 py-1.5 rounded-lg border border-white/5 w-fit">
+                      {course.courseType === 'Recorded' ? (
+                        <Video size={14} className="text-blue-400" />
+                      ) : (
+                        <Radio size={14} className="text-red-500 animate-pulse" />
+                      )}
+                      <span className="truncate">{course.courseType}</span>
+                    </div>
+                  )}
+                  {course.validity && (
+                    <div className="flex items-center gap-2 text-zinc-400 text-[13px] bg-white/5 px-3 py-1.5 rounded-lg border border-white/5 w-fit">
+                      {course.validity === 'Lifetime Access' ? (
+                        <Infinity size={14} className="text-emerald-400" />
+                      ) : (
+                        <CalendarClock size={14} className="text-amber-400" />
+                      )}
+                      <span className="truncate">{course.validity}</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Footer (Price & Button) */}
-                <div className="mt-auto pt-6 border-t border-white/10">
-                  <div className="flex items-end gap-3 mb-6">
+                <div className="mt-auto pt-4 border-t border-white/10">
+                  <div className="flex items-end gap-3 mb-4">
                     {course.isFree ? (
-                      <span className="text-3xl font-black bg-gradient-to-r from-emerald-400 to-teal-400 text-transparent bg-clip-text">Free</span>
+                      <span className="text-2xl font-black bg-gradient-to-r from-emerald-400 to-teal-400 text-transparent bg-clip-text">Free</span>
                     ) : (
                       <>
-                        <span className="text-3xl font-black text-white leading-none tracking-tight">
+                        <span className="text-2xl font-black text-white leading-none tracking-tight">
                           ₹{course.price}
                         </span>
                         {course.originalPrice > 0 && course.originalPrice > course.price && (
-                          <span className="text-base font-medium text-zinc-500 line-through leading-none mb-1">
+                          <span className="text-sm font-medium text-zinc-500 line-through leading-none mb-1">
                             ₹{course.originalPrice}
                           </span>
                         )}
                       </>
                     )}
                   </div>
-                  <button className="w-full py-3.5 bg-white text-black font-bold rounded-xl hover:bg-zinc-200 transition-all duration-300 text-[15px] flex items-center justify-center gap-2 group-hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] active:scale-95 group/btn">
+                  <button className="w-full py-3 bg-white text-black font-bold rounded-xl hover:bg-zinc-200 transition-all duration-300 text-[14px] flex items-center justify-center gap-2 group-hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] active:scale-95 group/btn">
                     View Course
                     <span className="group-hover/btn:translate-x-1 transition-transform">→</span>
                   </button>

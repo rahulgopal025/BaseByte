@@ -14,12 +14,19 @@ const notesSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  course: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Course',
-    default: null
+  description: {
+    type: String,
+    default: ''
   },
-  fileUrl: {
+  courses: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Course'
+  }],
+  notesPdfUrl: {
+    type: String,
+    default: ''
+  },
+  thumbnailUrl: {
     type: String,
     default: ''
   },
@@ -28,6 +35,10 @@ const notesSchema = new mongoose.Schema({
     default: ''
   },
   price: {
+    type: Number,
+    default: 0
+  },
+  offerPrice: {
     type: Number,
     default: 0
   },
@@ -42,8 +53,26 @@ const notesSchema = new mongoose.Schema({
   downloads: {
     type: Number,
     default: 0
+  },
+  totalPages: {
+    type: Number,
+    default: 0
+  },
+  previewStartPage: {
+    type: Number,
+    default: 1
+  },
+  previewEndPage: {
+    type: Number,
+    default: 5
+  },
+  isPremium: {
+    type: Boolean,
+    default: true
   }
   
 }, { timestamps: true });
 
 export default mongoose.model('Notes', notesSchema);
+
+

@@ -2,6 +2,7 @@ import asyncHandler from '../utils/asyncHandler.js';
 import ApiError from '../utils/ApiError.js';
 import ApiResponse from '../utils/ApiResponse.js';
 import Notification from '../models/Notification.js';
+import Enrollment from '../models/Enrollment.js';
 
 // @desc    Get all notifications for logged in user (global + targeted)
 // @route   GET /api/notifications
@@ -9,11 +10,18 @@ import Notification from '../models/Notification.js';
 export const getNotifications = asyncHandler(async (req, res) => {
   const userId = req.user.id;
 
-  // Fetch global notifications OR targeted to this user
+  // Find user's enrollments to get their courses and notes
+  const enrollments = await Enrollment.find({ userId: userId, status: 'approved' });
+  const userCourses = enrollments.filter(e => e.courseId).map(e => e.courseId);
+  const userNotes = enrollments.filter(e => e.noteId).map(e => e.noteId);
+
+  // Fetch global notifications OR targeted to this user, their courses, or their notes
   const notifications = await Notification.find({
     $or: [
       { isGlobal: true },
-      { userId: userId }
+      { targetUsers: userId },
+      { targetCourses: { $in: userCourses } },
+      { targetNotes: { $in: userNotes } }
     ]
   }).sort({ createdAt: -1 }).limit(50);
 
@@ -59,21 +67,26 @@ export const markAsRead = asyncHandler(async (req, res) => {
 // @route   POST /api/notifications
 // @access  Private/Admin
 export const createNotification = asyncHandler(async (req, res) => {
-  const { title, message, type, link } = req.body;
+  const { title, message, type, link, targetUsers, targetCourses, targetNotes } = req.body;
 
   if (!title || !message) {
     throw new ApiError(400, 'Title and message are required');
   }
 
+  const isGlobal = !(targetUsers?.length > 0 || targetCourses?.length > 0 || targetNotes?.length > 0);
+
   const notification = await Notification.create({
     title,
     message,
     type: type || 'SYSTEM',
-    isGlobal: true,
+    isGlobal,
+    targetUsers: targetUsers || [],
+    targetCourses: targetCourses || [],
+    targetNotes: targetNotes || [],
     link: link || ''
   });
 
-  res.status(201).json(new ApiResponse(201, notification, 'Notification sent to all users'));
+  res.status(201).json(new ApiResponse(201, notification, 'Notification created successfully'));
 });
 
 // @desc    Admin: Get all notifications
@@ -88,12 +101,23 @@ export const getAllAdminNotifications = asyncHandler(async (req, res) => {
 // @route   PUT /api/notifications/:id
 // @access  Private/Admin
 export const updateNotification = asyncHandler(async (req, res) => {
-  const { title, message, type, link } = req.body;
+  const { title, message, type, link, targetUsers, targetCourses, targetNotes } = req.body;
   const notificationId = req.params.id;
+
+  const isGlobal = !(targetUsers?.length > 0 || targetCourses?.length > 0 || targetNotes?.length > 0);
 
   const notification = await Notification.findByIdAndUpdate(
     notificationId,
-    { title, message, type, link },
+    { 
+      title, 
+      message, 
+      type, 
+      link, 
+      isGlobal,
+      targetUsers: targetUsers || [],
+      targetCourses: targetCourses || [],
+      targetNotes: targetNotes || []
+    },
     { new: true, runValidators: true }
   );
 

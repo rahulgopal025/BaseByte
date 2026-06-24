@@ -21,6 +21,7 @@ export const getAdminCourses = () => axiosInstance.get(`${BASE}/courses`);
 export const createCourse = (data: any) => axiosInstance.post(`${BASE}/courses`, data);
 export const updateCourse = (id: string, data: any) => axiosInstance.put(`${BASE}/courses/${id}`, data);
 export const deleteCourse = (id: string) => axiosInstance.delete(`${BASE}/courses/${id}`);
+export const enrollStudentsToCourse = (id: string, identifiers: string[]) => axiosInstance.post(`${BASE}/courses/${id}/enroll`, { identifiers });
 
 // Lectures
 export const getAdminLectures = () => axiosInstance.get(`${BASE}/lectures`);
@@ -33,6 +34,8 @@ export const getAdminProblems = () => axiosInstance.get(`${BASE}/problems`);
 export const createProblem = (data: any) => axiosInstance.post(`${BASE}/problems`, data);
 export const updateProblem = (id: string, data: any) => axiosInstance.put(`${BASE}/problems/${id}`, data);
 export const deleteProblem = (id: string) => axiosInstance.delete(`${BASE}/problems/${id}`);
+export const bulkUploadProblems = (problems: any[]) =>
+  axiosInstance.post(`${BASE}/problems/bulk`, { problems });
 
 // Bulk Quiz Upload
 export const bulkUploadQuiz = (questions: any[]) =>
@@ -43,7 +46,11 @@ export const deleteQuizQuestion = (id: string) => axiosInstance.delete(`${BASE}/
 export const getAdminNotes = () => axiosInstance.get(`${BASE}/notes`);
 export const uploadAdminNotes = (data: any) => axiosInstance.post(`${BASE}/notes`, data);
 export const approveNotes = (id: string) => axiosInstance.put(`${BASE}/notes/approve/${id}`);
-export const deleteNotes = (id: string) => axiosInstance.delete(`${BASE}/notes/${id}`);
+export const updateNotes = (id: string, data: any) => axiosInstance.put(`/api/admin/notes/${id}`, data);
+export const deleteNotes = (id: string) => axiosInstance.delete(`/api/admin/notes/${id}`);
+
+// Analytics
+export const getVisitorAnalytics = () => axiosInstance.get('/api/analytics/visitors');
 
 // Feedback
 export const getAdminFeedback = () => axiosInstance.get(`${BASE}/feedback`);
@@ -54,3 +61,14 @@ export const getAdminNotifications = () => axiosInstance.get('/api/notifications
 export const createAdminNotification = (data: any) => axiosInstance.post('/api/notifications', data);
 export const updateAdminNotification = (id: string, data: any) => axiosInstance.put(`/api/notifications/${id}`, data);
 export const deleteAdminNotification = (id: string) => axiosInstance.delete(`/api/notifications/${id}`);
+
+// Uploads
+export const uploadImage = (formData: FormData) => 
+  axiosInstance.post('/api/upload/image', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+
+export const uploadPdf = (formData: FormData) => 
+  axiosInstance.post('/api/upload/pdf', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });

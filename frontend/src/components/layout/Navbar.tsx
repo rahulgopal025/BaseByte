@@ -44,7 +44,7 @@ export default function Navbar() {
           
           {/* Navigation Links — Public */}
           <ul className="hidden md:flex gap-10 items-center font-bold text-sm tracking-widest uppercase">
-            {["/", "/practice", "/compiler", "/courses", "/about"].map((path) => (
+            {["/", "/practice", "/compiler", "/courses", "/notes", "/about"].map((path) => (
               <li 
                 key={path}
                 onClick={() => navigate(path)} 
@@ -99,7 +99,7 @@ export default function Navbar() {
       {isOpen && (
         <div className="md:hidden bg-card/95 backdrop-blur-2xl border-b border-border p-6 space-y-6 shadow-2xl animate-in slide-in-from-top duration-300">
           <div className="flex flex-col gap-6 font-bold text-muted text-lg">
-            {["Home", ...(user ? ["Practice"] : []), "Compiler", "Courses", "About"].map((item) => (
+            {["Home", ...(user ? ["Practice"] : []), "Compiler", "Courses", "Notes", "About"].map((item) => (
               <p key={item} onClick={() => {navigate(item === "Home" ? "/" : `/${item.toLowerCase()}`); setIsOpen(false)}} className="hover:text-indigo-400 transition-colors cursor-pointer capitalize">
                 {item}
               </p>

@@ -13,6 +13,10 @@ const enrollmentSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Course'
   },
+  noteId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Notes'
+  },
   status: {
     type: String,
     enum: ['pending', 'approved', 'rejected', 'blocked'],

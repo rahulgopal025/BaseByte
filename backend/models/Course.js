@@ -57,7 +57,19 @@ const courseSchema = new mongoose.Schema({
   isPublished: {
     type: Boolean,
     default: false
-  }
+  },
+  courseType: {
+    type: String,
+    default: 'Recorded'
+  },
+  validity: {
+    type: String,
+    default: 'Lifetime Access'
+  },
+  freeNotes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Notes'
+  }]
 }, { timestamps: true });
 
 export default mongoose.model('Course', courseSchema);

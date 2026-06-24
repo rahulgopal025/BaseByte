@@ -32,6 +32,8 @@ import CourseDetails from "./pages/user/CourseDetails";
 import CourseLearning from "./pages/user/CourseLearning";
 import MyCourses from "./pages/user/MyCourses";
 import Notes from "./pages/user/Notes";
+import NoteDetails from "./pages/user/NoteDetails";
+import NotesViewer from "./pages/user/NotesViewer";
 import Checkout from "./pages/user/Checkout";
 import Feedback from "./pages/user/Feedback";
 import NotFound from "./components/common/NotFound";
@@ -41,6 +43,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminCourses from "./pages/admin/AdminCourses";
 import AdminCourseForm from "./pages/admin/AdminCourseForm";
 import AdminCourseDetails from "./pages/admin/AdminCourseDetails";
+import AdminAddStudents from "./pages/admin/AdminAddStudents";
 import AdminLectureForm from "./pages/admin/AdminLectureForm";
 import AdminLectures from "./pages/admin/AdminLectures";
 import AdminStudents from "./pages/admin/AdminStudents";
@@ -50,8 +53,12 @@ import AdminProblems from "./pages/admin/AdminProblems";
 import AdminQuiz from "./pages/admin/AdminQuiz";
 import AdminFeedback from "./pages/admin/AdminFeedback";
 import AdminNotes from "./pages/admin/AdminNotes";
+import AdminNoteDetails from "./pages/admin/AdminNoteDetails";
+import AdminCreateNotes from "./pages/admin/AdminCreateNotes";
+import AdminVisitors from "./pages/admin/AdminVisitors";
 import AdminPracticePaths from "./pages/admin/AdminPracticePaths";
 import AdminNotifications from "./pages/admin/AdminNotifications";
+import AdminNotificationForm from "./pages/admin/AdminNotificationForm";
 
 export default function App() {
   return (
@@ -88,6 +95,8 @@ export default function App() {
                   <Route path="/courses/:id/learn" element={<CourseLearning />} />
                   <Route path="/my-courses" element={<MyCourses />} />
                   <Route path="/notes" element={<Notes />} />
+                  <Route path="/notes/:id" element={<NoteDetails />} />
+                  <Route path="/notes/:id/view" element={<NotesViewer />} />
                   <Route path="/checkout/:id" element={<Checkout />} />
                   <Route path="/feedback" element={<Feedback />} />
                 </Route>
@@ -103,6 +112,7 @@ export default function App() {
                   <Route path="/admin/courses/new" element={<AdminCourseForm />} />
                   <Route path="/admin/courses/:id/edit" element={<AdminCourseForm />} />
                   <Route path="/admin/courses/:id" element={<AdminCourseDetails />} />
+                  <Route path="/admin/courses/:id/add-students" element={<AdminAddStudents />} />
                   <Route path="/admin/courses/:courseId/lectures/new" element={<AdminLectureForm />} />
                   <Route path="/admin/courses/:courseId/lectures/:lectureId" element={<AdminLectureForm />} />
                   <Route path="/admin/lectures" element={<AdminLectures />} />
@@ -113,8 +123,13 @@ export default function App() {
                   <Route path="/admin/practice-paths" element={<AdminPracticePaths />} />
                   <Route path="/admin/quiz" element={<AdminQuiz />} />
                   <Route path="/admin/feedback" element={<AdminFeedback />} />
+                  <Route path="/admin/notes/create" element={<AdminCreateNotes />} />
                   <Route path="/admin/notes" element={<AdminNotes />} />
+                  <Route path="/admin/notes/:id" element={<AdminNoteDetails />} />
+                  <Route path="/admin/visitors" element={<AdminVisitors />} />
                   <Route path="/admin/notifications" element={<AdminNotifications />} />
+                  <Route path="/admin/notifications/new" element={<AdminNotificationForm />} />
+                  <Route path="/admin/notifications/:id/edit" element={<AdminNotificationForm />} />
                 </Route>
               </Route>
 

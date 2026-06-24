@@ -5,7 +5,7 @@ import {
   LayoutDashboard, Users, BookOpen, Video,
   Code2, FileQuestion, FileText, ClipboardList,
   MessageSquare, ChevronLeft, LogOut,
-  ChevronRight, Bell
+  ChevronRight, Bell, BarChart2
 } from "lucide-react";
 
 const navItems = [
@@ -43,6 +43,7 @@ const navItems = [
   {
     section: "Reports",
     items: [
+      { label: "Visitors", path: "/admin/visitors", icon: BarChart2, color: "text-emerald-400" },
       { label: "Feedback", path: "/admin/feedback", icon: MessageSquare, color: "text-rose-400" },
       { label: "Notifications", path: "/admin/notifications", icon: Bell, color: "text-amber-400" },
     ]
@@ -71,12 +72,16 @@ export default function AdminSidebar({ onMobileClose }: { onMobileClose?: () => 
     >
       {/* Logo */}
       <div className={`flex items-center justify-between gap-3 p-5 border-b border-border ${collapsed ? "justify-center" : ""}`}>
-        <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="Logo" className="w-9 h-9 object-contain" />
+        <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate("/admin")}>
+          <div className="group-hover:rotate-12 transition-transform shadow-lg shadow-indigo-500/20 rounded-xl">
+            <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
+          </div>
           {!collapsed && (
             <div>
-              <h1 className="text-foreground font-black text-base leading-tight">BaseByte</h1>
-              <p className="text-indigo-400 text-[9px] font-black uppercase tracking-widest">Admin Panel</p>
+              <h1 className="text-xl font-black bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent tracking-tight leading-none">
+                BaseByte
+              </h1>
+              <p className="text-indigo-400 text-[9px] font-black uppercase tracking-widest mt-1">Admin Panel</p>
             </div>
           )}
         </div>

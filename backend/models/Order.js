@@ -8,8 +8,11 @@ const orderSchema = new mongoose.Schema({
   },
   courseId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Course',
-    required: true
+    ref: 'Course'
+  },
+  noteId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Notes'
   },
   amount: {
     type: Number,

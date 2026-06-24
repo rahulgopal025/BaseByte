@@ -3,6 +3,7 @@ import Order from '../models/Order.js';
 import Enrollment from '../models/Enrollment.js';
 import Course from '../models/Course.js';
 import User from '../models/User.js';
+import Notes from '../models/Notes.js';
 import ApiResponse from '../utils/ApiResponse.js';
 import ApiError from '../utils/ApiError.js';
 import asyncHandler from '../utils/asyncHandler.js';
@@ -11,12 +12,29 @@ import asyncHandler from '../utils/asyncHandler.js';
 // For now this returns mock data. Replace with real Razorpay SDK when keys are ready.
 
 export const createOrder = asyncHandler(async (req, res) => {
-  const { courseId } = req.body;
-  if (!courseId) throw new ApiError(400, 'courseId is required.');
+  const { courseId, noteId } = req.body;
+  if (!courseId && !noteId) throw new ApiError(400, 'courseId or noteId is required.');
 
-  const course = await Course.findById(courseId);
-  if (!course) throw new ApiError(404, 'Course not found.');
-  if (course.isFree) throw new ApiError(400, 'This course is free. No payment needed.');
+  let item = null;
+  let itemType = '';
+  let price = 0;
+  let title = '';
+
+  if (courseId) {
+    item = await Course.findById(courseId);
+    if (!item) throw new ApiError(404, 'Course not found.');
+    if (item.isFree) throw new ApiError(400, 'This course is free. No payment needed.');
+    itemType = 'course';
+    price = item.price;
+    title = item.title;
+  } else if (noteId) {
+    item = await Notes.findById(noteId);
+    if (!item) throw new ApiError(404, 'Note not found.');
+    if (item.isFree) throw new ApiError(400, 'This note is free. No payment needed.');
+    itemType = 'note';
+    price = item.offerPrice > 0 ? item.offerPrice : item.price;
+    title = item.title;
+  }
 
   // When Razorpay keys are ready, replace this block with:
   // const Razorpay = (await import('razorpay')).default;
@@ -25,23 +43,24 @@ export const createOrder = asyncHandler(async (req, res) => {
 
   const order = await Order.create({
     userId: req.user.id,
-    courseId,
-    amount: course.price,
+    ...(courseId && { courseId }),
+    ...(noteId && { noteId }),
+    amount: price,
     currency: 'INR',
     status: 'created'
   });
 
   res.status(201).json(new ApiResponse(201, {
     orderId: order._id,
-    amount: course.price * 100,
+    amount: price * 100,
     currency: 'INR',
-    courseName: course.title,
+    itemName: title,
     key: process.env.RAZORPAY_KEY_ID || 'rzp_test_placeholder'
   }, 'Order created.'));
 });
 
 export const verifyPayment = asyncHandler(async (req, res) => {
-  const { orderId, courseId, razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
+  const { orderId, courseId, noteId, razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
 
   if (razorpay_signature && process.env.RAZORPAY_KEY_SECRET) {
     const body = razorpay_order_id + '|' + razorpay_payment_id;
@@ -62,7 +81,8 @@ export const verifyPayment = asyncHandler(async (req, res) => {
 
   const enrollment = await Enrollment.create({
     userId: req.user.id,
-    courseId,
+    ...(courseId && { courseId }),
+    ...(noteId && { noteId }),
     status: 'approved',
     paymentId: razorpay_payment_id || 'manual'
   });

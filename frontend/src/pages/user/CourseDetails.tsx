@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { BookOpen, Clock, User, Tag, CheckCircle2, Lock, IndianRupee, ArrowLeft } from "lucide-react";
+import { BookOpen, Clock, User, Tag, CheckCircle2, Lock, IndianRupee, ArrowLeft, FileText } from "lucide-react";
 import { getCourseById } from "../../api/course.api";
 import axiosInstance from "../../api/axios.instance";
 import { useAuth } from "../../hooks/useAuth";
@@ -16,12 +16,17 @@ export default function CourseDetails() {
   const [loading, setLoading] = useState(true);
   const [enrollment, setEnrollment] = useState<{ enrolled: boolean; status: string | null } | null>(null);
   const [enrolling, setEnrolling] = useState(false);
+  const [notes, setNotes] = useState<any[]>([]);
 
   useEffect(() => {
     getCourseById(id!)
       .then(res => setCourse(res.data.data))
       .catch(() => showToast("Course not found.", "error"))
       .finally(() => setLoading(false));
+
+    axiosInstance.get(`/api/courses/${id}/notes`)
+      .then(res => setNotes(res.data.data || []))
+      .catch(console.error);
 
     if (user) {
       axiosInstance.get(`/api/enrollments/check/${id}`)
@@ -144,6 +149,81 @@ export default function CourseDetails() {
                     #{tag}
                   </span>
                 ))}
+              </div>
+            )}
+
+            {/* Associated Premium Notes */}
+            {notes.length > 0 && (
+              <div className="mt-12 mb-12">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.2)]">
+                    <FileText className="text-indigo-400" size={20} />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-black text-white">Premium Notes Included</h3>
+                    <p className="text-sm text-zinc-400">You get full access to these premium notes when you enroll.</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {notes.map((note) => (
+                    <div
+                      key={note._id}
+                      onClick={() => navigate(`/notes/${note._id}`)}
+                      className="group relative bg-[#0d0d0e]/80 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden hover:-translate-y-2 hover:scale-[1.01] transition-all duration-500 cursor-pointer hover:shadow-[0_20px_40px_-15px_rgba(99,102,241,0.2)] hover:border-indigo-500/50 flex flex-col h-[360px]"
+                    >
+                      {/* Thumbnail Header Area */}
+                      <div className="h-[160px] relative overflow-hidden flex-shrink-0 bg-gradient-to-br from-indigo-900/40 to-fuchsia-900/40 border-b border-white/10 flex items-center justify-center">
+                        {note.thumbnailUrl ? (
+                          <img src={note.thumbnailUrl} alt={note.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                        ) : (
+                          <>
+                            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-fuchsia-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                            <FileText size={48} className="text-indigo-400/40 group-hover:text-indigo-400 transition-all duration-500 relative z-10" />
+                          </>
+                        )}
+                        {/* Floating Badges */}
+                        <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
+                          <span className="px-3 py-1 bg-black/50 backdrop-blur-md border border-white/10 text-white text-[10px] font-black uppercase tracking-wider rounded-full shadow-lg">
+                            {note.subject || "Course Material"}
+                          </span>
+                          <span className="px-3 py-1 bg-emerald-500/80 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-wider rounded-full shadow-lg border border-emerald-400/30">
+                            Included Free
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Content */}
+                      <div className="p-5 flex flex-col flex-1 relative z-10">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-colors duration-500 pointer-events-none" />
+
+                        <h3 className="font-bold text-lg tracking-tight leading-snug text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-fuchsia-400 transition-all line-clamp-2 drop-shadow-md mb-2">
+                          {note.title}
+                        </h3>
+
+                        <div className="flex items-center gap-2 text-zinc-400 text-xs font-medium mb-auto">
+                          <FileText size={14} className="text-indigo-400/70" /> 
+                          <span>{note.totalPages > 0 ? `${note.totalPages} Pages` : "Full Access"}</span>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="mt-4 pt-4 border-t border-white/10 flex items-center justify-between">
+                          <div className="flex items-end gap-2">
+                            {note.price > 0 && (
+                              <div className="flex flex-col">
+                                <span className="text-[10px] font-bold text-zinc-500 line-through">₹{note.price} value</span>
+                                <span className="text-lg font-black text-emerald-400 leading-none tracking-tight">Free</span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="h-8 px-4 bg-white/5 hover:bg-white/10 text-white font-bold rounded-lg flex items-center justify-center gap-1.5 transition-all duration-300 text-xs group-hover:bg-indigo-600 group-hover:shadow-[0_0_20px_rgba(79,70,229,0.3)]">
+                            View details <span className="group-hover:translate-x-1 transition-transform">→</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
